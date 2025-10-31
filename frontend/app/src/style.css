@@ -210,7 +210,7 @@ select {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
-  color: #555; /* Ensure readability */
+  color: #213547;
 }
 
 .data-table th {
@@ -532,4 +532,7 @@ select {
 
 .table-card th {
   background-color: #f2f2f2;
+}
+.data-table td {
+  background-color: #ffffff;
 }
