@@ -120,12 +120,20 @@ button:focus-visible {
 }
 
 .form-group input[type="email"],
-.form-group input[type="password"] {
+.form-group input[type="password"],
+.form-field input[type="text"],
+.form-field input[type="email"],
+.form-field input[type="number"],
+.form-field input[type="password"],
+.form-field textarea,
+select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
+  background-color: #ffffff;
+  color: #213547;
   font-size: 16px;
 }
 
@@ -233,17 +241,7 @@ button:focus-visible {
   color: #333;
 }
 
-.form-field input[type="text"],
-.form-field input[type="email"],
-.form-field input[type="number"],
-.form-field input[type="password"],
-.form-field textarea {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
+
 
 .form-actions button {
   background-color: #007bff;
@@ -475,13 +473,7 @@ button:focus-visible {
   width: 100%;
 }
 
-select {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
+
 
 .dashboard-item {
   background-color: #ffffff;
