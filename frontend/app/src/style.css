@@ -546,3 +546,7 @@ select {
 .form-view h2{
   color: #888;
 }
+
+.d-flex{
+  display: flex;
+}

@@ -16,11 +16,11 @@
           <a v-if="!item.path" class="navbar-link">
             {{ item.name }}
           </a>
-          <router-link v-else :to="item.path.startsWith('/' + moduleName) ? item.path : '/' + moduleName + item.path" class="navbar-item" @click="showMobileMenu = false">
+          <router-link v-else :to="item.path ? (item.path.startsWith('/' + moduleName) ? item.path : '/' + moduleName + item.path) : '#'" class="navbar-item" @click="showMobileMenu = false">
             {{ item.name }}
           </router-link>
           <div v-if="item.children && item.children.length" class="navbar-dropdown">
-            <router-link v-for="child in item.children" :key="child.id" :to="child.path.startsWith('/' + moduleName) ? child.path : '/' + moduleName + child.path" class="navbar-item" @click="showMobileMenu = false">
+            <router-link v-for="child in item.children" :key="child.id" :to="child.path ? (child.path.startsWith('/' + moduleName) ? child.path : '/' + moduleName + child.path) : '#'" class="navbar-item" @click="showMobileMenu = false">
               {{ child.name }}
             </router-link>
           </div>
@@ -83,7 +83,6 @@ const fetchMenuItems = async (module) => {
       throw new Error('Failed to fetch menu items')
     }
     menuItems.value = await response.json()
-    console.log(menuItems.value)
   } catch (error) {
     console.error('Error fetching menu items:', error)
   }
@@ -96,5 +95,3 @@ watch(() => props.moduleName, (newModule) => {
 }, { immediate: true })
 
 </script>
-
-

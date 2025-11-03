@@ -1,12 +1,15 @@
 <template>
   <div class="generic-model-view-container">
-    <h1>{{ modelName.charAt(0).toUpperCase() + modelName.slice(1) }}</h1>
+    <div class="d-flex">
+      <!-- <h2>{{ modelName.charAt(0).toUpperCase() + modelName.slice(1) }}</h2> -->
+      <h2>{{ formMode === 'create' ? 'Create New' : 'Edit' }} {{ modelName.charAt(0).toUpperCase() + modelName.slice(1) }}</h2>
+      <button @click="createNew">Create New {{ modelName.charAt(0).toUpperCase() + modelName.slice(1) }}</button>
+    </div>
 
     <div v-if="loading">Loading...</div>
     <div v-else-if="error">{{ error }}</div>
 
     <div v-else-if="showForm" class="form-view">
-      <h2>{{ formMode === 'create' ? 'Create New' : 'Edit' }} {{ modelName.charAt(0).toUpperCase() + modelName.slice(1) }}</h2>
       <form @submit.prevent="submitForm">
         <template v-if="uiSchema.views.form.layout">
           <FormGroup :group="uiSchema.views.form.layout" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
@@ -59,7 +62,6 @@
     </div>
 
     <div v-else class="list-view">
-      <button @click="createNew">Create New {{ modelName.charAt(0).toUpperCase() + modelName.slice(1) }}</button>
       <table class="data-table">
         <thead>
           <tr>
@@ -113,7 +115,7 @@ const loading = ref(true)
 const error = ref(null)
 const showForm = ref(false)
 const selectedRecord = ref(null)
-const formMode = ref('create')
+const formMode = ref('')
 
 const handleUnauthorized = (response) => {
   if (response.status === 401) {

@@ -2,6 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Navbar from './components/Navbar.vue'
+import { BRow, BCol, BCard, BForm, BFormGroup, BFormInput, BButton } from 'bootstrap-vue-next'
 
 const email = ref('')
 const password = ref('')
@@ -103,20 +104,24 @@ watch(isLoggedIn, (newVal) => {
     <Navbar v-if="route.params.moduleName" :module-name="route.params.moduleName" :user="user" @logout="handleLogout" @navigate-home="navigateHome" />
     <router-view />
   </div>
-  <div v-else class="login-container">
-    <form @submit.prevent="handleLogin" class="login-form">
-      <h2>Login</h2>
-      <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" v-model="email" required />
-      </div>
-      <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="password" id="password" v-model="password" required />
-      </div>
-      <button type="submit" class="login-button">Login</button>
-      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-    </form>
+  <div v-else class="container mt-5">
+    <b-row class="justify-content-center">
+      <b-col md="6">
+        <b-card>
+          <h2 class="text-center">Login</h2>
+          <b-form @submit.prevent="handleLogin">
+            <b-form-group label="Email:" label-for="email">
+              <b-form-input id="email" v-model="email" type="email" required></b-form-input>
+            </b-form-group>
+            <b-form-group label="Password:" label-for="password">
+              <b-form-input id="password" v-model="password" type="password" required></b-form-input>
+            </b-form-group>
+            <b-button type="submit" variant="primary" block>Login</b-button>
+            <p v-if="errorMessage" class="text-danger mt-3">{{ errorMessage }}</p>
+          </b-form>
+        </b-card>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
