@@ -11,6 +11,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --dp-input-padding: 6px 30px 10px 15px !important;
 }
 
 a {
@@ -535,4 +537,12 @@ select {
 }
 .data-table td {
   background-color: #ffffff;
+}
+.form-group-container {
+  display: flex;
+  gap: 5px;
+}
+
+.form-view h2{
+  color: #888;
 }

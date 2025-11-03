@@ -2,13 +2,15 @@ from sqlalchemy.orm import Session
 from backend.app.base.models.menu import Menu
 from backend.app.base.schemas.menu import MenuCreate, MenuUpdate
 
-def get_menu(db: Session, menu_id: int):
-    return db.query(Menu).filter(Menu.id == menu_id).first()
+def get_menu(db: Session, menu_path: int):
+    return db.query(Menu).filter(Menu.path == menu_path).first()
 
 def get_menus(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Menu).offset(skip).limit(limit).all()
 
 def create_menu(db: Session, menu: MenuCreate):
+    import pprint
+    pprint.pprint(menu)
     db_menu = Menu(**menu.dict())
     db.add(db_menu)
     db.commit()

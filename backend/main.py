@@ -18,13 +18,14 @@ from backend.app.crm.routers import customer as customer_router
 from backend.app.crm.routers import ui_schema_router as crm_ui_schema_router
 from backend.app.crm.routers import lead as lead_router
 from backend.app.crm.routers import opportunity as opportunity_router
-from backend.app.crm.routers import country as country_router
+from backend.app.base.routers import country as country_router
 from backend.app.crm.routers import crm_dashboard as crm_dashboard_router
 from .app.base.ui_schemas.menu import register_base_menus, MenuUISchema
-from backend.app.crm.ui_schemas.customer import register_crm_menus, CustomerUISchema
+from backend.app.crm.ui_schemas.menu import register_crm_menus
+from backend.app.crm.ui_schemas.customer import CustomerUISchema
 from backend.app.crm.ui_schemas.lead import LeadUISchema
 from backend.app.crm.ui_schemas.opportunity import OpportunityUISchema
-from backend.app.crm.ui_schemas.country import CountryUISchema
+from backend.app.base.ui_schemas.country import CountryUISchema
 from .app.base.ui_schemas.user import UserUISchema
 from .app.base.ui_schemas.group import GroupUISchema
 from .app.base.ui_schemas.access_right import AccessRightUISchema
@@ -63,11 +64,11 @@ app.include_router(user_group_router.router, prefix="/base/user_groups", tags=["
 app.include_router(auth_router.router, prefix="/base/auth", tags=["auth"])
 app.include_router(base_dashboard_router.router, prefix="/base", tags=["dashboard"])
 app.include_router(crm_dashboard_router.router, prefix="/crm", tags=["dashboard"])
-app.include_router(customer_router.router, prefix="/crm/customers", tags=["customers"])
+app.include_router(customer_router.router, prefix="/crm/customer", tags=["customers"])
 app.include_router(crm_ui_schema_router.router, prefix="/crm/ui_schemas", tags=["ui_schemas_crm"])
 app.include_router(lead_router.router, prefix="/crm/leads", tags=["leads"])
 app.include_router(opportunity_router.router, prefix="/crm/opportunities", tags=["opportunities"])
-app.include_router(country_router.router, prefix="/crm/country", tags=["countries"])
+app.include_router(country_router.router, prefix="/base/country", tags=["countries"])
 
 @app.on_event("startup")
 def on_startup():
@@ -75,10 +76,11 @@ def on_startup():
     db = SessionLocal()
     try:
         create_initial_data(db)
+        register_base_menus(db)
+        register_crm_menus(db)
     finally:
         db.close()
-    register_base_menus(db)
-    register_crm_menus(db)
+    
     register_base_dashboard_items()
     register_crm_dashboard_items()
 

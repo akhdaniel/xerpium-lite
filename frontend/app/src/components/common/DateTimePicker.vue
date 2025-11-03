@@ -1,5 +1,5 @@
 <template>
-  <div class="datetime-picker-container">
+  <div class="form-field">
     <label v-if="label">{{ label }}</label>
     <VueDatePicker
       :model-value="modelValue"
@@ -7,6 +7,7 @@
       :required="required"
       :text-input="true"
       :enable-time-picker="showTime" 
+      
     />
     <!-- 
           :model-type="showTime ? 'datetime' : 'date'"

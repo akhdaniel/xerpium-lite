@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, DateTime
 from sqlalchemy.orm import relationship
 from backend.app.base.models.base import Base
-from backend.app.crm.models.country import Country
+from backend.app.base.models.country import Country
 
 class Customer(Base):
     __tablename__ = "customers"

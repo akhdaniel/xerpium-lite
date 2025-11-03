@@ -39,11 +39,20 @@ class MenuUISchema(BaseUISchema):
 
 def register_base_menus(db: Session):
     register_menu_item(db, "base", {
+        "id": 10,
+        "name": "Settings",
+        "path": None,
+        "icon": "settings-icon",
+        "parent_id": None,
+        "order": 1,
+        "module": "base"
+    })
+    register_menu_item(db, "base", {
         "id": 1,
         "name": "Users",
         "path": "/users",
         "icon": "users-icon",
-        "parent_id": None,
+        "parent_id": 10,
         "order": 1,
         "module": "base"
     })
@@ -52,7 +61,7 @@ def register_base_menus(db: Session):
         "name": "Groups",
         "path": "/groups",
         "icon": "groups-icon",
-        "parent_id": None,
+        "parent_id": 10,
         "order": 2,
         "module": "base"
     })
@@ -61,7 +70,7 @@ def register_base_menus(db: Session):
         "name": "Access Rights",
         "path": "/access_rights",
         "icon": "access-rights-icon",
-        "parent_id": None,
+        "parent_id": 10,
         "order": 3,
         "module": "base"
     })
@@ -70,9 +79,19 @@ def register_base_menus(db: Session):
         "name": "Menus",
         "path": "/menus",
         "icon": "menus-icon",
-        "parent_id": None,
+        "parent_id": 10,
         "order": 4,
+        "module": "base"
+    })
+    register_menu_item(db, "base", {
+        "id": 100,
+        "name": "Countries",
+        "path": "/country",
+        "icon": "countries-icon",
+        "parent_id": None,
+        "order": 5,
         "module": "base"
     })
 
 register_ui_schema(MenuUISchema())
+

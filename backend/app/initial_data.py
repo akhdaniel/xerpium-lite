@@ -5,7 +5,7 @@ from backend.app.base.models.group import Group
 from backend.app.base.models.access_right import AccessRight
 from backend.app.base.models.user_group import UserGroup
 from backend.app.base.models.group_access_right import GroupAccessRight
-from backend.app.crm.models.country import Country
+from backend.app.base.models.country import Country
 from backend.app.crm.models.customer import Customer
 from backend.app.base.security import get_password_hash
 

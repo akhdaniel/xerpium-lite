@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 class CustomerUISchema(BaseUISchema):
     def __init__(self):
-        super().__init__("customers")
+        super().__init__("customer")
+
 
     def get_ui_schema(self):
         return {
@@ -35,50 +36,40 @@ class CustomerUISchema(BaseUISchema):
                         {"field": "email", "label": "Email", "type": "email", "required": True},
                         {"field": "phone_number", "label": "Phone Number", "type": "text", "required": False},
                         {"field": "address", "label": "Address", "type": "textarea", "required": False},
-                        {"field": "country_id", "label": "Country", "type": "many2one", "related_model": "country", "module_name": "crm", "required": False},
+                        {"field": "country_id", "label": "Country", "type": "many2one", "related_model": "country", "display_field": "name", "module_name": "base", "required": False},
                         {"field": "birth_date", "label": "Birth Date", "type": "date", "required": False},
                         {"field": "last_contacted", "label": "Last Contacted", "type": "datetime", "required": False}
-                    ]
+                    ],
+                    "layout": {
+                        "type": "group",
+                        "direction": "row",
+                        "children": [
+                            {
+                                "type": "group",
+                                "direction": "column",
+                                "children": [
+                                    {"field": "first_name"},
+                                    {"field": "last_name"},
+                                    {"field": "email"},
+                                    {"field": "phone_number"},
+                                    {"field": "address"},
+                                ]
+                            },
+                            {
+                                "type": "group",
+                                "direction": "column",
+                                "children": [
+                                    {"field": "country_id"},
+                                    {"field": "birth_date"},
+                                    {"field": "last_contacted"}
+                                ]
+                            }
+                        ]
+                    }
                 }
             }
         }
 
-def register_crm_menus(db: Session):
-    register_menu_item(db, "crm", {
-        "id": 5,
-        "name": "Customers",
-        "path": "/customers",
-        "icon": "customers-icon",
-        "parent_id": None,
-        "order": 1,
-        "module": "crm"
-    })
-    register_menu_item(db, "crm", {
-        "id": 6,
-        "name": "Leads",
-        "path": "/leads",
-        "icon": "leads-icon",
-        "parent_id": None,
-        "order": 2,
-        "module": "crm"
-    })
-    register_menu_item(db, "crm", {
-        "id": 7,
-        "name": "Opportunities",
-        "path": "/opportunities",
-        "icon": "opportunities-icon",
-        "parent_id": None,
-        "order": 3,
-        "module": "crm"
-    })
-    register_menu_item(db, "crm", {
-        "id": 8,
-        "name": "Countries",
-        "path": "/countries",
-        "icon": "countries-icon",
-        "parent_id": None,
-        "order": 4,
-        "module": "crm"
-    })
+
 
 register_ui_schema(CustomerUISchema())

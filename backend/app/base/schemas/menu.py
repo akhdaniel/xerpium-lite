@@ -3,14 +3,14 @@ from typing import Optional, List
 
 class MenuBase(BaseModel):
     name: str
-    path: str
+    path: Optional[str] = None
     icon: Optional[str] = None
     parent_id: Optional[int] = None
     order: int = 0
     module: str
 
 class MenuCreate(MenuBase):
-    pass
+    id: Optional[int] = None
 
 class MenuUpdate(MenuBase):
     pass

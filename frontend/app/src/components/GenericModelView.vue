@@ -8,44 +8,49 @@
     <div v-else-if="showForm" class="form-view">
       <h2>{{ formMode === 'create' ? 'Create New' : 'Edit' }} {{ modelName.charAt(0).toUpperCase() + modelName.slice(1) }}</h2>
       <form @submit.prevent="submitForm">
-        <div v-for="field in uiSchema.views.form.fields" :key="field.field" class="form-field">
-          <label :for="field.field">{{ field.label }}</label>
-          <input v-if="field.type === 'text' || field.type === 'email' || field.type === 'number' || field.type === 'password'" 
-                 :type="field.type" 
-                 :id="field.field" 
-                 v-model="selectedRecord[field.field]"
-                 :required="field.required">
-          <textarea v-else-if="field.type === 'textarea'" 
-                    :id="field.field" 
-                    v-model="selectedRecord[field.field]"
-                    :required="field.required"></textarea>
-          <Many2oneSelect v-else-if="field.type === 'many2one'"
-                          :moduleName="moduleName"
-                          :relatedModel="field.related_model"
-                          :field="field.field"
-                          :value="selectedRecord[field.field]"
-                          :displayField="field.display_field || 'name'"
-                          :required="field.required"
-                          @update:value="selectedRecord[field.field] = $event">
-          </Many2oneSelect>
-          <DateTimePicker v-else-if="field.type === 'datetime'"
-                          :field="field.field"
-                          v-model="selectedRecord[field.field]"
-                          :required="field.required"
-                          :showTime="true"
-                          :type="field.type"
-                          >
-          </DateTimePicker>
-          <DateTimePicker v-else-if="field.type === 'date'"
-                          :field="field.field"
-                          v-model="selectedRecord[field.field]"
-                          :required="field.required"
-                          :showTime="false"
-                          :type="field.type"
-                          >
-          </DateTimePicker>
-          <!-- Add more input types as needed -->
-        </div>
+        <template v-if="uiSchema.views.form.layout">
+          <FormGroup :group="uiSchema.views.form.layout" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
+        </template>
+        <template v-else>
+          <div v-for="field in uiSchema.views.form.fields" :key="field.field" class="form-field">
+            <label :for="field.field">{{ field.label }}</label>
+            <input v-if="field.type === 'text' || field.type === 'email' || field.type === 'number' || field.type === 'password'"
+                   :type="field.type"
+                   :id="field.field"
+                   v-model="selectedRecord[field.field]"
+                   :required="field.required">
+            <textarea v-else-if="field.type === 'textarea'"
+                      :id="field.field"
+                      v-model="selectedRecord[field.field]"
+                      :required="field.required"></textarea>
+            <Many2oneSelect v-else-if="field.type === 'many2one'"
+                            :moduleName="field.module_name"
+                            :relatedModel="field.related_model"
+                            :field="field.field"
+                            :value="selectedRecord[field.field]"
+                            :displayField="field.display_field || 'name'"
+                            :required="field.required"
+                            @update:value="selectedRecord[field.field] = $event">
+            </Many2oneSelect>
+            <DateTimePicker v-else-if="field.type === 'datetime'"
+                            :field="field.field"
+                            v-model="selectedRecord[field.field]"
+                            :required="field.required"
+                            :showTime="true"
+                            :type="field.type"
+                            >
+            </DateTimePicker>
+            <DateTimePicker v-else-if="field.type === 'date'"
+                            :field="field.field"
+                            v-model="selectedRecord[field.field]"
+                            :required="field.required"
+                            :showTime="false"
+                            :type="field.type"
+                            >
+            </DateTimePicker>
+            <!-- Add more input types as needed -->
+          </div>
+        </template>
         <div class="form-actions">
           <button type="submit">Save</button>
           <button type="button" @click="closeForm">Cancel</button>
@@ -85,6 +90,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Many2oneSelect from './common/Many2oneSelect.vue'
 import DateTimePicker from './common/DateTimePicker.vue'
+import FormGroup from './common/FormGroup.vue'
 
 const props = defineProps({
   moduleName: String,
@@ -94,6 +100,10 @@ const props = defineProps({
 const getNestedValue = (obj, path) => {
   if (!path) return obj;
   return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+};
+
+const getFieldSchema = (fieldName) => {
+  return uiSchema.value.views.form.fields.find(f => f.field === fieldName);
 };
 
 const route = useRoute()

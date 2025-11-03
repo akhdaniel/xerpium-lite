@@ -7,7 +7,7 @@ class Menu(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True, nullable=False)
-    path = Column(String, unique=True, nullable=False)
+    path = Column(String, unique=True, nullable=True)
     icon = Column(String, nullable=True)
     parent_id = Column(Integer, ForeignKey('menus.id'), nullable=True)
     order = Column(Integer, default=0)

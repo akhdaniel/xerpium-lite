@@ -25,7 +25,28 @@ class UserUISchema(BaseUISchema):
                         {"field": "username", "label": "Username", "type": "text", "required": True},
                         {"field": "email", "label": "Email", "type": "email", "required": True},
                         {"field": "password", "label": "Password", "type": "password", "required": True},
-                    ]
+                    ],
+                    "layout": {
+                        "type": "group",
+                        "direction": "row",
+                        "children": [
+                            {
+                                "type": "group",
+                                "direction": "column",
+                                "children": [
+                                    {"field": "username"},
+                                    {"field": "email"}
+                                ]
+                            },
+                            {
+                                "type": "group",
+                                "direction": "column",
+                                "children": [
+                                    {"field": "password"}
+                                ]
+                            }
+                        ]
+                    }
                 }
             }
         }

@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
-from backend.app.crm.schemas.country import Country
+from backend.app.base.schemas.country import Country
 
 class CustomerBase(BaseModel):
     first_name: str

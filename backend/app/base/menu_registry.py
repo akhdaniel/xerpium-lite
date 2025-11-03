@@ -5,7 +5,7 @@ from backend.app.base.schemas.menu import MenuCreate, MenuUpdate, Menu
 
 def register_menu_item(db: Session, module: str, menu_item_data: Dict[str, Any]):
     # Check if menu item with this ID already exists
-    existing_menu = menu_service.get_menu(db, menu_id=menu_item_data["id"])
+    existing_menu = menu_service.get_menu(db, menu_path=menu_item_data["path"])
     if existing_menu:
         # Update existing menu item
         menu_update = MenuUpdate(**menu_item_data)
@@ -25,6 +25,8 @@ def get_all_menu_items(db: Session) -> List[Dict[str, Any]]:
     return [Menu.from_orm(menu).dict() for menu in menus]
 
 def build_menu_hierarchy(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    import pprint 
+    pprint.pprint(items)
     # Create a dictionary for quick lookup by id
     item_map = {item['id']: item for item in items}
 

@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from backend.app.crm.schemas.country import Country, CountryCreate, CountryUpdate
-from backend.app.crm.services import country as country_service
+from backend.app.base.schemas.country import Country, CountryCreate, CountryUpdate
+from backend.app.base.services import country as country_service
 from backend.app.database import get_db
 
 router = APIRouter()

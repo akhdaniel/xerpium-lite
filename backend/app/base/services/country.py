@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-from backend.app.crm.models.country import Country
-from backend.app.crm.schemas.country import CountryCreate, CountryUpdate
+from backend.app.base.models.country import Country
+from backend.app.base.schemas.country import CountryCreate, CountryUpdate
 
 def get_country(db: Session, country_id: int) -> Optional[Country]:
     return db.query(Country).filter(Country.id == country_id).first()

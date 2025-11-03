@@ -3,7 +3,7 @@ from backend.app.base.ui_schema_registry import register_ui_schema
 
 class CountryUISchema(BaseUISchema):
     def __init__(self):
-        super().__init__("countries")
+        super().__init__("country")
 
     def get_ui_schema(self):
         return {
@@ -20,7 +20,20 @@ class CountryUISchema(BaseUISchema):
                     "title": "Country Form",
                     "fields": [
                         {"field": "name", "label": "Name", "type": "text", "required": True},
-                    ]
+                    ],
+                    "layout": {
+                        "type": "group",
+                        "direction": "row",
+                        "children": [
+                            {
+                                "type": "group",
+                                "direction": "column",
+                                "children": [
+                                    {"field": "name"}
+                                ]
+                            }
+                        ]
+                    }
                 }
             }
         }

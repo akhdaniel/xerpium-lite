@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
 from backend.app.crm.models.customer import Customer
 from backend.app.crm.schemas.customer import CustomerCreate, CustomerUpdate
-from backend.app.crm.models.country import Country
+from backend.app.base.models.country import Country
 
 def get_customer(db: Session, customer_id: int):
     return db.query(Customer).options(joinedload(Customer.country)).filter(Customer.id == customer_id).first()
