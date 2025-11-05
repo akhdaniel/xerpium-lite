@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 from backend.app.base.schemas.country import Country, CountryCreate, CountryUpdate
 from backend.app.base.services import country as country_service
@@ -16,8 +16,8 @@ def create_country(country: CountryCreate, db: Session = Depends(get_db)):
     return country_service.create_country(db=db, country=country)
 
 @router.get("/", response_model=List[Country])
-def read_countries(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    countries = country_service.get_countries(db, skip=skip, limit=limit)
+def read_countries(q: Optional[str] = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    countries = country_service.get_countries(db, q=q, skip=skip, limit=limit)
     return countries
 
 @router.get("/{country_id}", response_model=Country)

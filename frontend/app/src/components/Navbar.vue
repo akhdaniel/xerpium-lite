@@ -33,7 +33,7 @@
           </a>
           <div class="navbar-dropdown">
             <a class="navbar-item" @click="$emit('logout'); showMobileMenu = false">
-              Logout
+              <i class="bi bi-box-arrow-right"></i> Logout
             </a>
           </div>
         </div>

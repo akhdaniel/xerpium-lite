@@ -67,6 +67,7 @@ def create_initial_data(db: Session):
         {"name": "United Kingdom"},
         {"name": "Australia"},
         {"name": "Japan"},
+        {"name": "Indonesia"},
     ]
 
     for country_data in countries_data:

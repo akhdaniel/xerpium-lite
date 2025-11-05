@@ -10,8 +10,11 @@ def get_country(db: Session, country_id: int) -> Optional[Country]:
 def get_country_by_name(db: Session, name: str) -> Optional[Country]:
     return db.query(Country).filter(Country.name == name).first()
 
-def get_countries(db: Session, skip: int = 0, limit: int = 100) -> List[Country]:
-    return db.query(Country).offset(skip).limit(limit).all()
+def get_countries(db: Session, q: Optional[str] = None, skip: int = 0, limit: int = 100) -> List[Country]:
+    query = db.query(Country)
+    if q:
+        query = query.filter(Country.name.ilike(f"%{q}%"))
+    return query.offset(skip).limit(limit).all()
 
 def create_country(db: Session, country: CountryCreate) -> Country:
     db_country = Country(**country.dict())

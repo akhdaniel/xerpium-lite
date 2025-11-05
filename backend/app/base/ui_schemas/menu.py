@@ -30,7 +30,7 @@ class MenuUISchema(BaseUISchema):
                         {"field": "name", "label": "Name", "type": "text", "required": True},
                         {"field": "path", "label": "Path", "type": "text", "required": True},
                         {"field": "icon", "label": "Icon", "type": "text", "required": False},
-                        {"field": "parent_id", "label": "Parent Menu", "type": "select", "options_url": "/groups", "required": False},
+                        {"field": "parent_id", "label": "Parent Menu", "type": "autocomplete", "url": "/base/menus", "required": False},
                         {"field": "order", "label": "Order", "type": "number", "required": False, "default": 0},
                     ]
                 }

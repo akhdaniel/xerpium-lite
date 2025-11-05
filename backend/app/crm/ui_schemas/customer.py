@@ -36,7 +36,7 @@ class CustomerUISchema(BaseUISchema):
                         {"field": "email", "label": "Email", "type": "email", "required": True},
                         {"field": "phone_number", "label": "Phone Number", "type": "text", "required": False},
                         {"field": "address", "label": "Address", "type": "textarea", "required": False},
-                        {"field": "country_id", "label": "Country", "type": "many2one", "related_model": "country", "display_field": "name", "module_name": "base", "required": False},
+                        {"field": "country_id", "label": "Country", "type": "autocomplete", "url": "/base/country", "display_field": "name", "required": False},
                         {"field": "birth_date", "label": "Birth Date", "type": "date", "required": False},
                         {"field": "last_contacted", "label": "Last Contacted", "type": "datetime", "required": False}
                     ],

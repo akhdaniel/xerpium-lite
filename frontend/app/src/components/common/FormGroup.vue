@@ -5,15 +5,21 @@
         <FormGroup :group="child" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
       </template>
       <template v-else>
-        <div class="form-field">
-          <label :for="child.field">{{ getFieldSchema(child.field).label }}</label>
-          <input v-if="getFieldSchema(child.field).type === 'text' || getFieldSchema(child.field).type === 'email' || getFieldSchema(child.field).type === 'number' || getFieldSchema(child.field).type === 'password'"
+        <div class="form-group">
+          <label class="form-label" :for="child.field">{{ getFieldSchema(child.field).label }}</label>
+          <input v-if="getFieldSchema(child.field).type === 'text' || getFieldSchema(child.field).type === 'number' || getFieldSchema(child.field).type === 'password'"
+                 class="form-control"
                  :type="getFieldSchema(child.field).type"
                  :id="child.field"
                  v-model="selectedRecord[child.field]"
                  :required="getFieldSchema(child.field).required">
+          <EmailInput v-else-if="getFieldSchema(child.field).type === 'email'"
+                      :id="child.field"
+                      v-model="selectedRecord[child.field]"
+                      :required="getFieldSchema(child.field).required" />
           <textarea v-else-if="getFieldSchema(child.field).type === 'textarea'"
                     :id="child.field"
+                 class="form-control"
                     v-model="selectedRecord[child.field]"
                     :required="getFieldSchema(child.field).required"></textarea>
           <Many2oneSelect v-else-if="getFieldSchema(child.field).type === 'many2one'"
@@ -25,6 +31,12 @@
                           :required="getFieldSchema(child.field).required"
                           @update:value="selectedRecord[child.field] = $event">
           </Many2oneSelect>
+          <Autocomplete v-else-if="getFieldSchema(child.field).type === 'autocomplete'"
+                        :url="getFieldSchema(child.field).url"
+                        v-model="selectedRecord[child.field]"
+                        :required="getFieldSchema(child.field).required"
+                        >
+          </Autocomplete>
           <DateTimePicker v-else-if="getFieldSchema(child.field).type === 'datetime'"
                           :field="child.field"
                           v-model="selectedRecord[child.field]"
@@ -51,6 +63,8 @@
 import Many2oneSelect from './Many2oneSelect.vue'
 import DateTimePicker from './DateTimePicker.vue'
 import FormGroup from './FormGroup.vue'
+import Autocomplete from './Autocomplete.vue'
+import EmailInput from './EmailInput.vue'
 
 const props = defineProps({
   group: Object,
