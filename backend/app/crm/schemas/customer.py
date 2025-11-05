@@ -1,34 +1,31 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import date, datetime
-from backend.app.base.schemas.country import Country
+from backend.app.crm.schemas.address import Address, AddressCreate
 
 class CustomerBase(BaseModel):
     first_name: str
     last_name: str
     email: str
     phone_number: Optional[str] = None
-    address: Optional[str] = None
-    country_id: Optional[int] = None
     birth_date: Optional[date] = None
     last_contacted: Optional[datetime] = None
 
 class CustomerCreate(CustomerBase):
-    pass
+    addresses: List[AddressCreate] = []
 
 class CustomerUpdate(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     email: Optional[str] = None
     phone_number: Optional[str] = None
-    address: Optional[str] = None
-    country_id: Optional[int] = None
     birth_date: Optional[date] = None
     last_contacted: Optional[datetime] = None
+    addresses: List[AddressCreate] = []
 
 class Customer(CustomerBase):
     id: int
-    country: Optional[Country] = None
+    addresses: List[Address] = []
 
     class Config:
         from_attributes = True

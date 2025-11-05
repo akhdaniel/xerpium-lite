@@ -8,6 +8,7 @@
       @blur="onBlur"
       placeholder="Search..."
       class="form-control"
+      :required="required"
     />
     <ul v-if="showSuggestions" class="suggestions">
       <li
@@ -25,8 +26,9 @@
 import { ref, watch, onMounted } from 'vue';
 
 const props = defineProps({
-  modelValue: [String, Number],
+  modelValue: [String, Number, Object],
   url: String,
+  required: Boolean,
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -67,7 +69,7 @@ const fetchSuggestions = async () => {
 
 const selectSuggestion = (suggestion) => {
   searchTerm.value = suggestion.name;
-  emit('update:modelValue', suggestion.id);
+  emit('update:modelValue', suggestion);
   showSuggestions.value = false;
 };
 
@@ -107,12 +109,20 @@ const fetchRecord = async (id) => {
 
 onMounted(() => {
   if (props.modelValue) {
-    fetchRecord(props.modelValue);
+    if (typeof props.modelValue === 'object') {
+      searchTerm.value = props.modelValue.name;
+    } else {
+      fetchRecord(props.modelValue);
+    }
   }
 });
 
 watch(() => props.modelValue, (newValue) => {
-  fetchRecord(newValue);
+  if (typeof newValue === 'object') {
+    searchTerm.value = newValue.name;
+  } else {
+    fetchRecord(newValue);
+  }
 });
 </script>
 

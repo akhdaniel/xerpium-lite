@@ -7,6 +7,7 @@ from backend.app.base.models.user_group import UserGroup
 from backend.app.base.models.group_access_right import GroupAccessRight
 from backend.app.base.models.country import Country
 from backend.app.crm.models.customer import Customer
+from backend.app.crm.models.address import Address
 from backend.app.base.security import get_password_hash
 
 def create_initial_data(db: Session):
@@ -88,11 +89,19 @@ def create_initial_data(db: Session):
             first_name="John",
             last_name="Doe",
             email="john.doe@example.com",
-            phone_number="123-456-7890",
-            address="123 Main St, Anytown, USA",
-            country_id=usa_country.id if usa_country else None
+            phone_number="123-456-7890"
         )
         db.add(customer1)
+        db.flush()
+        address1 = Address(
+            street="123 Main St",
+            city="Anytown",
+            state="USA",
+            zip_code="12345",
+            country_id=usa_country.id if usa_country else None,
+            customer_id=customer1.id
+        )
+        db.add(address1)
         print("Sample customer John Doe created.")
     else:
         print("Sample customer John Doe already exists.")
@@ -104,11 +113,19 @@ def create_initial_data(db: Session):
             first_name="Jane",
             last_name="Smith",
             email="jane.smith@example.com",
-            phone_number="098-765-4321",
-            address="456 Oak Ave, Otherville, Canada",
-            country_id=canada_country.id if canada_country else None
+            phone_number="098-765-4321"
         )
         db.add(customer2)
+        db.flush()
+        address2 = Address(
+            street="456 Oak Ave",
+            city="Otherville",
+            state="Canada",
+            zip_code="67890",
+            country_id=canada_country.id if canada_country else None,
+            customer_id=customer2.id
+        )
+        db.add(address2)
         print("Sample customer Jane Smith created.")
     else:
         print("Sample customer Jane Smith already exists.")

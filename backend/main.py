@@ -20,6 +20,7 @@ from backend.app.crm.routers import lead as lead_router
 from backend.app.crm.routers import opportunity as opportunity_router
 from backend.app.base.routers import country as country_router
 from backend.app.crm.routers import crm_dashboard as crm_dashboard_router
+from backend.app.crm.routers import address as address_router
 from .app.base.ui_schemas.menu import register_base_menus, MenuUISchema
 from backend.app.crm.ui_schemas.menu import register_crm_menus
 from backend.app.crm.ui_schemas.customer import CustomerUISchema
@@ -69,6 +70,7 @@ app.include_router(crm_ui_schema_router.router, prefix="/crm/ui_schemas", tags=[
 app.include_router(lead_router.router, prefix="/crm/leads", tags=["leads"])
 app.include_router(opportunity_router.router, prefix="/crm/opportunities", tags=["opportunities"])
 app.include_router(country_router.router, prefix="/base/country", tags=["countries"])
+app.include_router(address_router.router, prefix="/crm/addresses", tags=["addresses"])
 
 @app.on_event("startup")
 def on_startup():

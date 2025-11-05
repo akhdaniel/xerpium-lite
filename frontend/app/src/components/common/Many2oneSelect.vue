@@ -1,5 +1,5 @@
 <template>
-  <select :id="field" :value="value" @change="handleChange" :required="required">
+  <select :id="field" :value="modelValue?.id" @change="handleChange" :required="required" class="form-control">
     <option value="">-- Select a {{ relatedModel }} --</option>
     <option v-for="item in items" :key="item.id" :value="item.id">
       {{ item[displayField] }}
@@ -24,8 +24,8 @@ const props = defineProps({
     type: String,
     required: true
   },
-  value: {
-    type: [Number, String],
+  modelValue: {
+    type: [Number, String, Object],
     default: null
   },
   displayField: {
@@ -38,7 +38,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:modelValue'])
 const items = ref([])
 const router = useRouter()
 
@@ -70,7 +70,9 @@ const fetchItems = async () => {
 }
 
 const handleChange = (event) => {
-  emit('update:value', event.target.value ? parseInt(event.target.value) : null)
+  const selectedId = event.target.value ? parseInt(event.target.value) : null;
+  const selectedItem = items.value.find(item => item.id === selectedId);
+  emit('update:modelValue', selectedItem);
 }
 
 onMounted(fetchItems)

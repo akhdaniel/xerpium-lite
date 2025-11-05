@@ -6,7 +6,10 @@
       </template>
       <template v-else>
         <div class="form-group">
-          <label class="form-label" :for="child.field">{{ getFieldSchema(child.field).label }}</label>
+          <label class="form-label" :for="child.field">
+            {{ getFieldSchema(child.field).label }}
+            <span v-if="getFieldSchema(child.field).required" style="color: red;">*</span>
+          </label>
           <input v-if="getFieldSchema(child.field).type === 'text' || getFieldSchema(child.field).type === 'number' || getFieldSchema(child.field).type === 'password'"
                  class="form-control"
                  :type="getFieldSchema(child.field).type"
@@ -53,6 +56,11 @@
                           :type="getFieldSchema(child.field).type"
                           >
           </DateTimePicker>
+          <One2many v-else-if="getFieldSchema(child.field).type === 'one2many'"
+                    :field="getFieldSchema(child.field)"
+                    v-model="selectedRecord[child.field]"
+                    >
+          </One2many>
         </div>
       </template>
     </div>
@@ -65,6 +73,7 @@ import DateTimePicker from './DateTimePicker.vue'
 import FormGroup from './FormGroup.vue'
 import Autocomplete from './Autocomplete.vue'
 import EmailInput from './EmailInput.vue'
+import One2many from './One2many.vue'
 
 const props = defineProps({
   group: Object,

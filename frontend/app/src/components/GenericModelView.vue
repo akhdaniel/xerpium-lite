@@ -3,7 +3,7 @@
     <BRow class="px-3 pt-3">
       <BCol lg="8" md="8"  xs="12" sm="12" class="text-start">
         <button class="btn btn-secondary btn-sm" @click="createNew">New</button>
-        <button v-if="selectedRecords.length > 0 && !showForm" class="btn btn-danger btn-sm ms-2" @click="deleteSelectedRecords">Delete Selected</button>
+        <button v-if="selectedRecords.length > 0 && !showForm" class="btn btn-danger btn-sm ms-2" @click="deleteSelectedRecords"><i class="bi bi-trash"></i> Delete Selected</button>
         <span v-if="showForm" class="pt-2 px-2 text-bold fw-bold" style="text-align:left">
           {{ formMode === 'create' ? 'Create New' : 'Edit' }} {{ modelName.charAt(0).toUpperCase() + modelName.slice(1) }}
         </span>
@@ -34,7 +34,10 @@
         <template v-else>
           <div v-for="field in uiSchema.views.form.fields" :key="field.field" class="form-group">
             {{ console.log(field) }}
-            <label :for="field.field">{{ field.label }}</label>
+            <label :for="field.field">
+              {{ field.label }}
+              <span v-if="field.required" style="color: red;">*</span>
+            </label>
             <input v-if="field.type === 'text' || field.type === 'number' || field.type === 'password'"
                    :type="field.type"
                    :id="field.field"
@@ -81,6 +84,11 @@
                             :type="field.type"
                             >
             </DateTimePicker>
+            <One2many v-else-if="field.type === 'one2many'"
+                      :field="field"
+                      v-model="selectedRecord[field.field]"
+                      >
+            </One2many>
             <!-- Add more input types as needed -->
           </div>
         </template>
@@ -123,6 +131,7 @@ import DateTimePicker from './common/DateTimePicker.vue'
 import FormGroup from './common/FormGroup.vue'
 import Autocomplete from './common/Autocomplete.vue'
 import EmailInput from './common/EmailInput.vue'
+import One2many from './common/One2many.vue'
 import { BRow, BCol, BCard, BForm, BFormGroup, BFormInput, BButton } from 'bootstrap-vue-next'
 
 const props = defineProps({
