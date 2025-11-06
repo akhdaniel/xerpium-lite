@@ -555,3 +555,9 @@ select {
 .d-flex{
   display: flex;
 }
+
+.tabs button.active {
+  background-color: #fff;
+  border-bottom-color: #0056b3 !important;
+  color: black;
+}

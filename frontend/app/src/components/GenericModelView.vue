@@ -3,9 +3,13 @@
     <BRow class="px-3 pt-3">
       <BCol lg="8" md="8"  xs="12" sm="12" class="text-start">
         <button class="btn btn-secondary btn-sm" @click="createNew">New</button>
+        <button v-if="showForm" type="submit" form="main-form" class="btn btn-primary btn-sm ms-2">Save</button>
+        <button v-if="showForm" type="button" class="btn btn-secondary btn-sm ms-2" @click="closeForm">Back</button>
         <button v-if="selectedRecords.length > 0 && !showForm" class="btn btn-danger btn-sm ms-2" @click="deleteSelectedRecords"><i class="bi bi-trash"></i> Delete Selected</button>
-        <span v-if="showForm" class="pt-2 px-2 text-bold fw-bold" style="text-align:left">
-          {{ formMode === 'create' ? 'Create New' : 'Edit' }} {{ modelName.charAt(0).toUpperCase() + modelName.slice(1) }}
+                        <span v-if="showForm" class="pt-2 px-2 text-bold fw-bold" style="text-align:left">
+          <a href="#" @click.prevent="closeForm">{{ modelName.charAt(0).toUpperCase() + modelName.slice(1) }}</a>
+          /
+          <span>{{ formMode === 'create' ? 'New' : selectedRecord.name || `${modelName},${selectedRecord.id}` }}</span>
         </span>
         <span v-if="!showForm" class="pt-2 px-2 text-bold fw-bold" style="text-align:left">
           {{ modelName.charAt(0).toUpperCase() + modelName.slice(1) }}
@@ -27,12 +31,9 @@
     <div v-else-if="error">{{ error }}</div>
 
     <div v-else-if="showForm" class="form-view">
-      <form @submit.prevent="submitForm">
-        <div class="form-actions">
-          <button type="submit">Save</button>
-          <button type="button" @click="closeForm">Cancel</button>
-        </div>
-        <template v-if="uiSchema.views.form.layout && uiSchema.views.form.layout.type === 'notebook'">
+      <form id="main-form" @submit.prevent="submitForm">
+        
+                <!-- <template v-if="uiSchema.views.form.layout && uiSchema.views.form.layout.type === 'notebook'">
           <div class="tabs">
               <button type="button"
               v-for="tab in uiSchema.views.form.layout.tabs"
@@ -50,10 +51,11 @@
               </div>
             </template>
           </div>
-        </template>
-        <template v-else-if="uiSchema.views.form.layout">
+        </template> -->
+        <template v-if="uiSchema.views.form.layout && uiSchema.views.form.layout.type === 'group'">
           <FormGroup :group="uiSchema.views.form.layout" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
         </template>
+
         <template v-else>
           <div v-for="field in uiSchema.views.form.fields" :key="field.field" class="form-group">
             <label :for="field.field">
@@ -345,6 +347,17 @@ const submitForm = async () => {
       body.birth_date = body.birth_date.toISOString().split('T')[0];
     }
 
+    if (body.addresses) {
+      body.addresses = body.addresses.map(addr => {
+        const newAddr = { ...addr };
+        if (newAddr.country && typeof newAddr.country === 'object') {
+          newAddr.country_id = newAddr.country.id;
+          delete newAddr.country;
+        }
+        return newAddr;
+      });
+    }
+
     const response = await fetch(url, {
       method: method,
       headers: {
@@ -358,8 +371,10 @@ const submitForm = async () => {
     if (!response.ok) {
       throw new Error('Failed to save record')
     }
+    const savedRecord = await response.json();
+    selectedRecord.value = savedRecord;
+    formMode.value = 'edit';
     await fetchRecords()
-    closeForm()
   } catch (e) {
     error.value = e.message
   } finally {

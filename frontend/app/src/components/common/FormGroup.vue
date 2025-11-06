@@ -4,6 +4,9 @@
       <template v-if="child.type === 'group'">
         <FormGroup :group="child" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
       </template>
+      <template v-else-if="child.type === 'notebook'">
+        <Notebook :notebook="child" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
+      </template>
       <template v-else>
         <div class="form-group">
           <label class="form-label" :for="child.field">
@@ -74,6 +77,7 @@ import FormGroup from './FormGroup.vue'
 import Autocomplete from './Autocomplete.vue'
 import EmailInput from './EmailInput.vue'
 import One2many from './One2many.vue'
+import Notebook from './Notebook.vue'
 
 const props = defineProps({
   group: Object,

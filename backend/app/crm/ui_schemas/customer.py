@@ -36,46 +36,50 @@ class CustomerUISchema(BaseUISchema):
                         {"field": "addresses", "label": "Addresses", "type": "one2many", "related_model": "address", "module_name": "crm", 
                             "views": {
                                 "list": {"title": "Addresses List", "columns": [{"field": "street", "headerName": "Street", "type": "string"}, {"field": "city", "headerName": "City", "type": "string"}, {"field": "state", "headerName": "State", "type": "string"}, {"field": "zip_code", "headerName": "Zip Code", "type": "string"}, {"field": "country", "headerName": "Country", "type": "many2one"}]}, 
-                                "form": {"title": "Address Form", "fields": [{"field": "street", "label": "Street", "type": "text", "required": True}, {"field": "city", "label": "City", "type": "text", "required": True}, {"field": "state", "label": "State", "type": "text", "required": False}, {"field": "zip_code", "label": "Zip Code", "type": "text", "required": False}, {"field": "country", "label": "Country", "type": "autocomplete", "required": True, "url": "/base/country/autocomplete"}]}
+                                "form": {"title": "Address Form", "fields": [
+                                    {"field": "street", "label": "Street", "type": "text", "required": True}, 
+                                    {"field": "city", "label": "City", "type": "text", "required": True}, 
+                                    {"field": "state", "label": "State", "type": "text", "required": False}, 
+                                    {"field": "zip_code", "label": "Zip Code", "type": "text", "required": False}, 
+                                                                                                            {"field": "country", "label": "Country", "type": "autocomplete", "required": True, "url": "/base/country"}
+                                ]}
                             }
                         }
                     ],
                     "layout": {
-                        "type": "notebook",
-                        "tabs": [
+                        "type": "group",
+                        "children": [
                             {
-                                "label": "General",
+                                "type": "group",
+                                "direction": "row",
                                 "children": [
-                                    {
-                                        "type": "group",
-                                        "direction": "row",
-                                        "children": [
-                                            {"field": "first_name"},
-                                            {"field": "last_name"},
-                                        ]
-                                    },
-                                    {
-                                        "type": "group",
-                                        "direction": "row",
-                                        "children": [
-                                           
-                                            {"field": "email"},
-                                            {"field": "phone_number"},                                ]
-                                    },
-                                    {
-                                        "type": "group",
-                                        "direction": "row",
-                                        "children": [                                   
-                                            {"field": "birth_date"},
-                                            {"field": "last_contacted"},   
-                                        ]
-                                    }
+                                    {"field": "first_name"},
+                                    {"field": "last_name"},
                                 ]
                             },
                             {
-                                "label": "Addresses",
+                                "type": "group",
+                                "direction": "row",
                                 "children": [
-                                    {"field": "addresses"}
+                                    
+                                    {"field": "email"},
+                                    {"field": "phone_number"},                                ]
+                            },
+                            {
+                                "type": "group",
+                                "direction": "row",
+                                "children": [                                   
+                                    {"field": "birth_date"},
+                                    {"field": "last_contacted"},   
+                                ]
+                            },
+                            {
+                                "type": "notebook",
+                                "tabs": [                                   
+                                    {
+                                        "label":"Addresses",
+                                        "field": "addresses"
+                                    },
                                 ]
                             }
                         ]
