@@ -69,7 +69,7 @@ const fetchSuggestions = async () => {
 
 const selectSuggestion = (suggestion) => {
   searchTerm.value = suggestion.name;
-  emit('update:modelValue', suggestion);
+  emit('update:modelValue', suggestion.id);
   showSuggestions.value = false;
 };
 

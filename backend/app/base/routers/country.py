@@ -20,6 +20,11 @@ def read_countries(q: Optional[str] = None, skip: int = 0, limit: int = 100, db:
     countries = country_service.get_countries(db, q=q, skip=skip, limit=limit)
     return countries
 
+@router.get("/autocomplete", response_model=List[Country])
+def autocomplete_countries(q: Optional[str] = None, db: Session = Depends(get_db)):
+    countries = country_service.get_countries(db, q=q, limit=10) # Limit to 10 suggestions
+    return countries
+
 @router.get("/{country_id}", response_model=Country)
 def read_country(country_id: int, db: Session = Depends(get_db)):
     db_country = country_service.get_country(db, country_id=country_id)

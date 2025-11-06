@@ -28,12 +28,34 @@
 
     <div v-else-if="showForm" class="form-view">
       <form @submit.prevent="submitForm">
-        <template v-if="uiSchema.views.form.layout">
+        <div class="form-actions">
+          <button type="submit">Save</button>
+          <button type="button" @click="closeForm">Cancel</button>
+        </div>
+        <template v-if="uiSchema.views.form.layout && uiSchema.views.form.layout.type === 'notebook'">
+          <div class="tabs">
+              <button type="button"
+              v-for="tab in uiSchema.views.form.layout.tabs"
+              :key="tab.label"
+              :class="{ active: currentTab === tab.label }"
+              @click="selectTab(tab.label)"
+            >
+              {{ tab.label }}
+            </button>
+          </div>
+          <div class="tab-content">
+            <template v-for="tab in uiSchema.views.form.layout.tabs" :key="tab.label">
+              <div v-show="currentTab === tab.label">
+                <FormGroup :group="{ type: 'group', children: tab.children }" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
+              </div>
+            </template>
+          </div>
+        </template>
+        <template v-else-if="uiSchema.views.form.layout">
           <FormGroup :group="uiSchema.views.form.layout" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
         </template>
         <template v-else>
           <div v-for="field in uiSchema.views.form.fields" :key="field.field" class="form-group">
-            {{ console.log(field) }}
             <label :for="field.field">
               {{ field.label }}
               <span v-if="field.required" style="color: red;">*</span>
@@ -92,10 +114,7 @@
             <!-- Add more input types as needed -->
           </div>
         </template>
-        <div class="form-actions">
-          <button type="submit">Save</button>
-          <button type="button" @click="closeForm">Cancel</button>
-        </div>
+        
       </form>
     </div>
 
@@ -149,7 +168,42 @@ const getNestedValue = (obj, path) => {
 };
 
 const getFieldSchema = (fieldName) => {
-  return uiSchema.value.views.form.fields.find(f => f.field === fieldName);
+  // First, try to find in the top-level fields array
+  let fieldSchema = uiSchema.value.views.form.fields.find(f => f.field === fieldName);
+
+  // If not found, and a layout exists, search within the layout structure
+  if (!fieldSchema && uiSchema.value.views.form.layout) {
+    const searchInLayout = (layoutChildren) => {
+      for (const child of layoutChildren) {
+        if (child.field === fieldName) {
+          // Found the field reference in the layout, now get its full schema from the fields array
+          return uiSchema.value.views.form.fields.find(f => f.field === fieldName);
+        }
+        if (child.type === 'group' && child.children) {
+          const foundInGroup = searchInLayout(child.children);
+          if (foundInGroup) return foundInGroup;
+        }
+        if (child.type === 'notebook' && child.tabs) {
+          for (const tab of child.tabs) {
+            if (tab.children) {
+              const foundInTab = searchInLayout(tab.children);
+              if (foundInTab) return foundInTab;
+            }
+          }
+        }
+      }
+      return null;
+    };
+
+    // Start searching from the top-level children of the layout, or tabs if it's a notebook
+    if (uiSchema.value.views.form.layout.type === 'notebook') {
+      fieldSchema = searchInLayout(uiSchema.value.views.form.layout.tabs);
+    } else {
+      fieldSchema = searchInLayout(uiSchema.value.views.form.layout.children);
+    }
+  }
+
+  return fieldSchema || { label: fieldName, type: 'text', required: false };
 };
 
 const route = useRoute()
@@ -159,7 +213,12 @@ const loading = ref(true)
 const error = ref(null)
 const showForm = ref(false)
 const selectedRecord = ref(null)
-const formMode = ref('')
+const formMode = ref('');
+const currentTab = ref(null);
+
+const selectTab = (tabName) => {
+  currentTab.value = tabName;
+};
 
 const sortBy = (key) => {
   if (sortKey.value === key) {
@@ -382,7 +441,35 @@ watch(() => props.modelName, () => {
     fetchUISchema()
   }
 }, { immediate: true })
+
+watch(uiSchema, (newSchema) => {
+  if (newSchema && newSchema.views.form.layout && newSchema.views.form.layout.type === 'notebook' && newSchema.views.form.layout.tabs.length > 0) {
+    currentTab.value = newSchema.views.form.layout.tabs[0].label;
+  }
+}, { immediate: true });
 </script>
+
+<style scoped>
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 15px;
+}
+
+.tabs button {
+  padding: 10px 15px;
+  border: none;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  border-radius: 5px 5px 0 0;
+  margin-right: 5px;
+}
+
+.tabs button.active {
+  background-color: #fff;
+  border-bottom: 1px solid #fff;
+}
+</style>
 
 
 

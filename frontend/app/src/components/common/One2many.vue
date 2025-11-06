@@ -15,7 +15,12 @@
         <tr v-for="(record, index) in sortedRecords" :key="index" @click="editRecord(index)" style="cursor: pointer;">
           <td><input type="checkbox" class="form-check-input" :value="index" v-model="selectedRecords" @click.stop /></td>
           <td v-for="column in field.views.list.columns" :key="column.field">
-            {{ getNestedValue(record, column.field) }}
+            <template v-if="column.type === 'many2one' && record[column.field]">
+              {{ record[column.field].name }}
+            </template>
+            <template v-else>
+              {{ getNestedValue(record, column.field) }}
+            </template>
           </td>
         </tr>
       </tbody>

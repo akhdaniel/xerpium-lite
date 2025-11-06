@@ -33,62 +33,51 @@ class CustomerUISchema(BaseUISchema):
                         {"field": "phone_number", "label": "Phone Number", "type": "text", "required": False},
                         {"field": "birth_date", "label": "Birth Date", "type": "date", "required": False},
                         {"field": "last_contacted", "label": "Last Contacted", "type": "datetime", "required": False},
-                        {
-                            "field": "addresses",
-                            "label": "Addresses",
-                            "type": "one2many",
-                            "related_model": "address",
+                        {"field": "addresses", "label": "Addresses", "type": "one2many", "related_model": "address", "module_name": "crm", 
                             "views": {
-                                "list": {
-                                    "columns": [
-                                        {"field": "street", "headerName": "Street", "type": "string"},
-                                        {"field": "city", "headerName": "City", "type": "string"},
-                                        {"field": "state", "headerName": "State", "type": "string"},
-                                        {"field": "zip_code", "headerName": "Zip Code", "type": "string"},
-                                        {"field": "country.name", "headerName": "Country", "type": "string"},
-                                    ]
-                                },
-                                "form": {
-                                    "fields": [
-                                        {"field": "street", "label": "Street", "type": "text", "required": True},
-                                        {"field": "city", "label": "City", "type": "text", "required": True},
-                                        {"field": "state", "label": "State", "type": "text", "required": False},
-                                        {"field": "zip_code", "label": "Zip Code", "type": "text", "required": False},
-                                        {"field": "country", "label": "Country", "type": "autocomplete", "url": "/base/country", "display_field": "name", "required": True},
-                                    ]
-                                }
+                                "list": {"title": "Addresses List", "columns": [{"field": "street", "headerName": "Street", "type": "string"}, {"field": "city", "headerName": "City", "type": "string"}, {"field": "state", "headerName": "State", "type": "string"}, {"field": "zip_code", "headerName": "Zip Code", "type": "string"}, {"field": "country", "headerName": "Country", "type": "many2one"}]}, 
+                                "form": {"title": "Address Form", "fields": [{"field": "street", "label": "Street", "type": "text", "required": True}, {"field": "city", "label": "City", "type": "text", "required": True}, {"field": "state", "label": "State", "type": "text", "required": False}, {"field": "zip_code", "label": "Zip Code", "type": "text", "required": False}, {"field": "country", "label": "Country", "type": "autocomplete", "required": True, "url": "/base/country/autocomplete"}]}
                             }
                         }
                     ],
                     "layout": {
-                        "type": "group",
-                        "direction": "column",
-                        "children": [
+                        "type": "notebook",
+                        "tabs": [
                             {
-                                "type": "group",
-                                "direction": "row",
+                                "label": "General",
                                 "children": [
-                                    {"field": "first_name"},
-                                    {"field": "last_name"},
+                                    {
+                                        "type": "group",
+                                        "direction": "row",
+                                        "children": [
+                                            {"field": "first_name"},
+                                            {"field": "last_name"},
+                                        ]
+                                    },
+                                    {
+                                        "type": "group",
+                                        "direction": "row",
+                                        "children": [
+                                           
+                                            {"field": "email"},
+                                            {"field": "phone_number"},                                ]
+                                    },
+                                    {
+                                        "type": "group",
+                                        "direction": "row",
+                                        "children": [                                   
+                                            {"field": "birth_date"},
+                                            {"field": "last_contacted"},   
+                                        ]
+                                    }
                                 ]
                             },
                             {
-                                "type": "group",
-                                "direction": "row",
+                                "label": "Addresses",
                                 "children": [
-                                   
-                                    {"field": "email"},
-                                    {"field": "phone_number"},                                ]
-                            },
-                            {
-                                "type": "group",
-                                "direction": "row",
-                                "children": [                                   
-                                    {"field": "birth_date"},
-                                    {"field": "last_contacted"},   
+                                    {"field": "addresses"}
                                 ]
-                            },
-                            {"field": "addresses"},
+                            }
                         ]
                     }
                 }
