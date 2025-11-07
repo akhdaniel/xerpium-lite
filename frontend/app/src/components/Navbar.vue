@@ -1,57 +1,48 @@
 <template>
-  <nav class="navbar">
-    <div class="navbar-brand">
-      <a class="navbar-item logo" @click="$emit('navigate-home')">
-        {{ moduleName.toUpperCase() }}
-      </a>
-      <a role="button" class="navbar-burger burger" :class="{'is-active': showMobileMenu}" aria-label="menu" aria-expanded="false" @click="toggleMobileMenu">
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-      </a>
-    </div>
-    <div class="navbar-menu" :class="{'is-active': showMobileMenu}">
-      <div class="navbar-start">
-        <div v-for="item in menuItems" :key="item.id" class="navbar-item has-dropdown is-hoverable">
-          <a v-if="!item.path" class="navbar-link">
-            {{ item.name }}
-          </a>
-          <router-link v-else :to="item.path ? (item.path.startsWith('/' + moduleName) ? item.path : '/' + moduleName + item.path) : '#'" class="navbar-item" @click="showMobileMenu = false">
-            {{ item.name }}
-          </router-link>
-          <div v-if="item.children && item.children.length" class="navbar-dropdown">
-            <router-link v-for="child in item.children" :key="child.id" :to="child.path ? (child.path.startsWith('/' + moduleName) ? child.path : '/' + moduleName + child.path) : '#'" class="navbar-item" @click="showMobileMenu = false">
+  <BNavbar toggleable="lg" 
+    v-b-color-mode="'dark'"
+    variant="dark"
+  >
+    <BNavbarBrand @click="$emit('navigate-home')">{{ moduleName.toUpperCase() }}</BNavbarBrand>
+    <BNavbarToggle target="nav-collapse" @click="toggleMobileMenu" />
+    <BCollapse id="nav-collapse" is-nav :visible="showMobileMenu">
+      <BNavbarNav>
+        <template v-for="item in menuItems" :key="item.id">
+          <BNavItemDropdown v-if="item.children && item.children.length" :text="item.name" >
+            <BDropdownItem v-for="child in item.children" :key="child.id" :to="child.path ? (child.path.startsWith('/' + moduleName) ? child.path : '/' + moduleName + child.path) : '#'" @click="showMobileMenu = false">
               {{ child.name }}
-            </router-link>
-          </div>
-        </div>
-      </div>
-      <div class="navbar-end">
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link">
-            {{ user.username }}
-          </a>
-          <div class="navbar-dropdown">
-            <a class="navbar-item" @click="$emit('logout'); showMobileMenu = false">
-              <i class="bi bi-box-arrow-right"></i> Logout
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </nav>
+            </BDropdownItem>
+          </BNavItemDropdown>
+          <BNavItem v-else :to="item.path ? (item.path.startsWith('/' + moduleName) ? item.path : '/' + moduleName + item.path) : '#'" @click="showMobileMenu = false">
+            {{ item.name }}
+          </BNavItem>
+        </template>
+      </BNavbarNav>
+
+      <BNavbarNav class="ms-auto">
+        <BNavItemDropdown right>
+          <template #button-content>
+            <em>{{ user.username }}</em>
+          </template>
+          <BDropdownItem @click="$emit('logout'); showMobileMenu = false">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </BDropdownItem>
+        </BNavItemDropdown>
+      </BNavbarNav>
+    </BCollapse>
+  </BNavbar>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { authenticatedFetch } from '../utils/api'
+import { BNavbar, BNavbarBrand, BNavbarNav, BNavItem, BNavItemDropdown, BDropdownItem, BCollapse, BNavbarToggle } from 'bootstrap-vue-next'
 
 const props = defineProps({
   moduleName: String,
   user: Object,
 })
 
-const router = useRouter()
 const menuItems = ref([])
 const showMobileMenu = ref(false)
 
@@ -59,32 +50,17 @@ const toggleMobileMenu = () => {
   showMobileMenu.value = !showMobileMenu.value
 }
 
-const handleUnauthorized = (response) => {
-  if (response.status === 401) {
-    localStorage.removeItem('authToken')
-    router.push('/login')
-    return true
-  }
-  return false
-}
-
 const fetchMenuItems = async (module) => {
   try {
-    const token = localStorage.getItem('authToken')
-    const response = await fetch(`http://localhost:8000/base/menu/${module}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      }
-    )
-    if (handleUnauthorized(response)) return
+    const response = await authenticatedFetch(`http://localhost:8000/base/menu/${module}`)
     if (!response.ok) {
       throw new Error('Failed to fetch menu items')
     }
     menuItems.value = await response.json()
   } catch (error) {
-    console.error('Error fetching menu items:', error)
+    if (error.message !== 'Unauthorized') {
+      console.error('Error fetching menu items:', error)
+    }
   }
 }
 
@@ -95,3 +71,5 @@ watch(() => props.moduleName, (newModule) => {
 }, { immediate: true })
 
 </script>
+
+
