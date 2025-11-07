@@ -3,6 +3,15 @@ from sqlalchemy.orm import Session
 
 def register_crm_menus(db: Session):
     register_menu_item(db, "crm", {
+        "id": 8,
+        "name": "Dashboard",
+        "path": "/crm/dashboard",
+        "icon": "dashboard-icon",
+        "parent_id": None,
+        "order": 0,
+        "module": "crm"
+    })
+    register_menu_item(db, "crm", {
         "id": 5,
         "name": "Customers",
         "path": "/customer",

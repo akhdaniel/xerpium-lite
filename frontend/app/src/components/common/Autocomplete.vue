@@ -24,6 +24,7 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
+import { authenticatedFetch } from '../../utils/api';
 
 const props = defineProps({
   modelValue: [String, Number, Object],
@@ -53,17 +54,14 @@ const fetchSuggestions = async () => {
     return;
   }
   try {
-    const token = localStorage.getItem('authToken');
-    const response = await fetch(`http://localhost:8000${props.url}?q=${searchTerm.value}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    const response = await authenticatedFetch(`http://localhost:8000${props.url}?q=${searchTerm.value}`);
     if (response.ok) {
       suggestions.value = await response.json();
     }
   } catch (error) {
-    console.error('Error fetching suggestions:', error);
+    if (error.message !== 'Unauthorized') {
+      console.error('Error fetching suggestions:', error);
+    }
   }
 };
 
@@ -91,19 +89,15 @@ const fetchRecord = async (id) => {
     return;
   }
   try {
-    const token = localStorage.getItem('authToken');
-    // The URL for a single record is usually props.url + '/' + id
-    const response = await fetch(`http://localhost:8000${props.url}/${id}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    const response = await authenticatedFetch(`http://localhost:8000${props.url}/${id}`);
     if (response.ok) {
       const record = await response.json();
       searchTerm.value = record.name;
     }
   } catch (error) {
-    console.error('Error fetching record:', error);
+    if (error.message !== 'Unauthorized') {
+      console.error('Error fetching record:', error);
+    }
   }
 };
 

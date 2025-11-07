@@ -154,6 +154,7 @@ import Autocomplete from './common/Autocomplete.vue'
 import EmailInput from './common/EmailInput.vue'
 import One2many from './common/One2many.vue'
 import { BRow, BCol, BCard, BForm, BFormGroup, BFormInput, BButton } from 'bootstrap-vue-next'
+import { authenticatedFetch } from '../utils/api'
 
 const props = defineProps({
   moduleName: String,
@@ -257,35 +258,20 @@ const toggleSelectAll = (event) => {
   }
 };
 
-const handleUnauthorized = (response) => {
-  if (response.status === 401) {
-    localStorage.removeItem('authToken')
-    router.push('/login')
-    return true
-  }
-  return false
-}
-
 const fetchUISchema = async () => {
   loading.value = true
   error.value = null
   try {
-    const token = localStorage.getItem('authToken')
-    const response = await fetch(`http://localhost:8000/${props.moduleName}/ui_schemas/${props.modelName.toLowerCase()}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      }
-    )
-    if (handleUnauthorized(response)) return
+    const response = await authenticatedFetch(`http://localhost:8000/${props.moduleName}/ui_schemas/${props.modelName.toLowerCase()}`)
     if (!response.ok) {
       throw new Error('Failed to fetch UI schema')
     }
     uiSchema.value = await response.json()
     fetchRecords()
   } catch (e) {
-    error.value = e.message
+    if (e.message !== 'Unauthorized') {
+      error.value = e.message
+    }
   }
 }
 
@@ -293,21 +279,15 @@ const fetchRecords = async () => {
   loading.value = true
   error.value = null
   try {
-    const token = localStorage.getItem('authToken')
-    const response = await fetch(`http://localhost:8000/${props.moduleName}/${props.modelName.toLowerCase()}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      }
-    )
-    if (handleUnauthorized(response)) return
+    const response = await authenticatedFetch(`http://localhost:8000/${props.moduleName}/${props.modelName.toLowerCase()}`)
     if (!response.ok) {
       throw new Error('Failed to fetch records')
     }
     records.value = await response.json()
   } catch (e) {
-    error.value = e.message
+    if (e.message !== 'Unauthorized') {
+      error.value = e.message
+    }
   } finally {
     loading.value = false
   }
@@ -334,7 +314,6 @@ const submitForm = async () => {
   loading.value = true
   error.value = null
   try {
-    const token = localStorage.getItem('authToken')
     const url = formMode.value === 'create'
       ? `http://localhost:8000/${props.moduleName}/${props.modelName.toLowerCase()}`
       : `http://localhost:8000/${props.moduleName}/${props.modelName.toLowerCase()}/${selectedRecord.value.id}`
@@ -358,16 +337,14 @@ const submitForm = async () => {
       });
     }
 
-    const response = await fetch(url, {
+    const response = await authenticatedFetch(url, {
       method: method,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(body),
     })
 
-    if (handleUnauthorized(response)) return
     if (!response.ok) {
       throw new Error('Failed to save record')
     }
@@ -376,7 +353,9 @@ const submitForm = async () => {
     formMode.value = 'edit';
     await fetchRecords()
   } catch (e) {
-    error.value = e.message
+    if (e.message !== 'Unauthorized') {
+      error.value = e.message
+    }
   } finally {
     loading.value = false
   }
@@ -390,22 +369,19 @@ const deleteRecord = async (recordId) => {
   loading.value = true
   error.value = null
   try {
-    const token = localStorage.getItem('authToken')
-    const response = await fetch(`http://localhost:8000/${props.moduleName}/${props.modelName.toLowerCase()}/${recordId}`,
+    const response = await authenticatedFetch(`http://localhost:8000/${props.moduleName}/${props.modelName.toLowerCase()}/${recordId}`,
       {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
       }
     )
-    if (handleUnauthorized(response)) return
     if (!response.ok) {
       throw new Error('Failed to delete record')
     }
     await fetchRecords()
   } catch (e) {
-    error.value = e.message
+    if (e.message !== 'Unauthorized') {
+      error.value = e.message
+    }
   } finally {
     loading.value = false
   }
@@ -423,20 +399,15 @@ const deleteSelectedRecords = async () => {
   loading.value = true;
   error.value = null;
   try {
-    const token = localStorage.getItem('authToken');
     const promises = selectedRecords.value.map(recordId => {
-      return fetch(`http://localhost:8000/${props.moduleName}/${props.modelName.toLowerCase()}/${recordId}`, {
+      return authenticatedFetch(`http://localhost:8000/${props.moduleName}/${props.modelName.toLowerCase()}/${recordId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
       });
     });
 
     const responses = await Promise.all(promises);
 
     responses.forEach(response => {
-      if (handleUnauthorized(response)) return;
       if (!response.ok) {
         throw new Error('Failed to delete one or more records');
       }
@@ -445,7 +416,9 @@ const deleteSelectedRecords = async () => {
     await fetchRecords();
     selectedRecords.value = [];
   } catch (e) {
-    error.value = e.message;
+    if (e.message !== 'Unauthorized') {
+      error.value = e.message;
+    }
   } finally {
     loading.value = false;
   }
@@ -485,7 +458,3 @@ watch(uiSchema, (newSchema) => {
   border-bottom: 1px solid #fff;
 }
 </style>
-
-
-
-

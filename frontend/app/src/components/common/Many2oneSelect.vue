@@ -9,7 +9,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { authenticatedFetch } from '../../utils/api'
 
 const props = defineProps({
   moduleName: {
@@ -40,32 +40,18 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 const items = ref([])
-const router = useRouter()
-
-const handleUnauthorized = (response) => {
-  if (response.status === 401) {
-    localStorage.removeItem('authToken')
-    router.push('/login')
-    return true
-  }
-  return false
-}
 
 const fetchItems = async () => {
   try {
-    const token = localStorage.getItem('authToken')
-    const response = await fetch(`http://localhost:8000/${props.moduleName}/${props.relatedModel.toLowerCase()}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    })
-    if (handleUnauthorized(response)) return
+    const response = await authenticatedFetch(`http://localhost:8000/${props.moduleName}/${props.relatedModel.toLowerCase()}`)
     if (!response.ok) {
       throw new Error(`Failed to fetch ${props.relatedModel}`)
     }
     items.value = await response.json()
   } catch (e) {
-    console.error(`Error fetching ${props.relatedModel}:`, e)
+    if (e.message !== 'Unauthorized') {
+      console.error(`Error fetching ${props.relatedModel}:`, e)
+    }
   }
 }
 
@@ -77,5 +63,3 @@ const handleChange = (event) => {
 
 onMounted(fetchItems)
 </script>
-
-

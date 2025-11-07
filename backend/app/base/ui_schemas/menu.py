@@ -39,6 +39,15 @@ class MenuUISchema(BaseUISchema):
 
 def register_base_menus(db: Session):
     register_menu_item(db, "base", {
+        "id": 9,
+        "name": "Dashboard",
+        "path": "/base/dashboard",
+        "icon": "dashboard-icon",
+        "parent_id": None,
+        "order": 0,
+        "module": "base"
+    })
+    register_menu_item(db, "base", {
         "id": 10,
         "name": "Settings",
         "path": None,
@@ -81,6 +90,15 @@ def register_base_menus(db: Session):
         "icon": "menus-icon",
         "parent_id": 10,
         "order": 4,
+        "module": "base"
+    })
+    register_menu_item(db, "base", {
+        "id": 101,
+        "name": "Companies",
+        "path": "/company",
+        "icon": "companies-icon",
+        "parent_id": 10,
+        "order": 5,
         "module": "base"
     })
     register_menu_item(db, "base", {

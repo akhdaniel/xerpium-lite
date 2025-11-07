@@ -14,6 +14,7 @@ from .app.base.routers import group_menu as group_menu_router
 from .app.base.routers import user_group as user_group_router
 from .app.base.routers import auth as auth_router
 from .app.base.routers import base_dashboard as base_dashboard_router
+from backend.app.base.routers import company as company_router
 from backend.app.crm.routers import customer as customer_router
 from backend.app.crm.routers import ui_schema_router as crm_ui_schema_router
 from backend.app.crm.routers import lead as lead_router
@@ -27,6 +28,7 @@ from backend.app.crm.ui_schemas.customer import CustomerUISchema
 from backend.app.crm.ui_schemas.lead import LeadUISchema
 from backend.app.crm.ui_schemas.opportunity import OpportunityUISchema
 from backend.app.base.ui_schemas.country import CountryUISchema
+from backend.app.base.ui_schemas.company import CompanyUISchema
 from .app.base.ui_schemas.user import UserUISchema
 from .app.base.ui_schemas.group import GroupUISchema
 from .app.base.ui_schemas.access_right import AccessRightUISchema
@@ -71,6 +73,7 @@ app.include_router(lead_router.router, prefix="/crm/leads", tags=["leads"])
 app.include_router(opportunity_router.router, prefix="/crm/opportunities", tags=["opportunities"])
 app.include_router(country_router.router, prefix="/base/country", tags=["countries"])
 app.include_router(address_router.router, prefix="/crm/addresses", tags=["addresses"])
+app.include_router(company_router.router, prefix="/base/company", tags=["company"])
 
 @app.on_event("startup")
 def on_startup():
@@ -98,6 +101,7 @@ def on_startup():
     register_ui_schema(LeadUISchema())
     register_ui_schema(OpportunityUISchema())
     register_ui_schema(CountryUISchema())
+    register_ui_schema(CompanyUISchema())
 
 @app.get("/")
 def read_root():
