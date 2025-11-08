@@ -22,6 +22,7 @@ from backend.app.crm.routers import opportunity as opportunity_router
 from backend.app.base.routers import country as country_router
 from backend.app.crm.routers import crm_dashboard as crm_dashboard_router
 from backend.app.crm.routers import address as address_router
+from backend.app.base.routers import module as module_router
 from backend.app.base.ui_schemas.menu import register_base_menus
 from backend.app.crm.ui_schemas.menu import register_crm_menus
 from backend.app.base.dashboard_items import register_base_dashboard_items
@@ -67,6 +68,7 @@ app.include_router(opportunity_router.router, prefix="/crm/opportunities", tags=
 app.include_router(country_router.router, prefix="/base/country", tags=["countries"])
 app.include_router(address_router.router, prefix="/crm/addresses", tags=["addresses"])
 app.include_router(company_router.router, prefix="/base/company", tags=["company"])
+app.include_router(module_router.router, prefix="/base/modules", tags=["modules"])
 
 @app.on_event("startup")
 def on_startup():

@@ -8,6 +8,7 @@ from backend.app.base.models.group_access_right import GroupAccessRight
 from backend.app.base.models.country import Country
 from backend.app.crm.models.customer import Customer
 from backend.app.crm.models.address import Address
+from backend.app.base.models.module import Module
 from backend.app.base.security import get_password_hash
 
 def create_initial_data(db: Session):
@@ -53,8 +54,24 @@ def create_initial_data(db: Session):
     # Define all models for access rights
     model_names = [
         "User", "Group", "AccessRight", "Menu", "Customer", "Lead", "Opportunity", "Country",
-        "UserGroup", "GroupAccessRight", "GroupMenu", "Dashboard", "UI_Schema"
+        "UserGroup", "GroupAccessRight", "GroupMenu", "Dashboard", "UI_Schema", "Module"
     ]
+
+    # Create initial Module data if it doesn't exist
+    modules_data = [
+        {"name": "base", "is_active": True},
+        {"name": "crm", "is_active": True},
+    ]
+
+    for module_data in modules_data:
+        module = db.query(Module).filter(Module.name == module_data["name"]).first()
+        if not module:
+            module = Module(**module_data)
+            db.add(module)
+            db.flush()
+            print(f"Module {module.name} created.")
+        else:
+            print(f"Module {module.name} already exists.")
 
     # Create initial Country data if it doesn't exist
     countries_data = [

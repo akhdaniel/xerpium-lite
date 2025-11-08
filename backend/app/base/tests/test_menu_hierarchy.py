@@ -31,3 +31,4 @@ def test_menu_hierarchy(override_get_db, db_session, admin_auth_headers, client)
     assert "Access Rights" in children_names
     assert "Menus" in children_names
     assert "UI Schemas" in children_names
+    assert "Modules" in children_names

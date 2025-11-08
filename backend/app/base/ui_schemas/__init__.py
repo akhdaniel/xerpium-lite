@@ -8,3 +8,4 @@ from . import menu
 from . import user_group
 from . import user
 from . import ui_schemas
+from . import module
