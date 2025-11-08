@@ -428,6 +428,7 @@ const deleteSelectedRecords = async () => {
 
 watch(() => props.modelName, () => {
   if (props.modelName) {
+    showForm.value = false; // Reset to list view
     fetchUISchema()
   }
 }, { immediate: true })
