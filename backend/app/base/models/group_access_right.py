@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
-from .base import Base
+from backend.app.database import Base
 
 class GroupAccessRight(Base):
     __tablename__ = "group_access_rights"

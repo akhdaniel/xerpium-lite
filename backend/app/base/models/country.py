@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from backend.app.base.models.base import Base
+from backend.app.database import Base
 
 class Country(Base):
     __tablename__ = "countries"

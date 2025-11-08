@@ -17,20 +17,29 @@ from .app.base.routers import base_dashboard as base_dashboard_router
 from backend.app.base.routers import company as company_router
 from backend.app.crm.routers import customer as customer_router
 from backend.app.crm.routers import ui_schema_router as crm_ui_schema_router
+from backend.app.inventory.routers import ui_schema_router as inventory_ui_schema_router
 from backend.app.crm.routers import lead as lead_router
 from backend.app.crm.routers import opportunity as opportunity_router
 from backend.app.base.routers import country as country_router
 from backend.app.crm.routers import crm_dashboard as crm_dashboard_router
 from backend.app.crm.routers import address as address_router
 from backend.app.base.routers import module as module_router
+from backend.app.inventory.routers import product as product_router
+from backend.app.inventory.routers import warehouse as warehouse_router
+from backend.app.inventory.routers import location as location_router
+from backend.app.inventory.routers import inventory_movement as inventory_movement_router
+from backend.app.inventory.routers import inventory_dashboard as inventory_dashboard_router
 from backend.app.base.ui_schemas.menu import register_base_menus
 from backend.app.crm.ui_schemas.menu import register_crm_menus
+from backend.app.inventory.ui_schemas.menu import register_inventory_menus
 from backend.app.base.dashboard_items import register_base_dashboard_items
 from backend.app.crm.dashboard_items import register_crm_dashboard_items
+from backend.app.inventory.dashboard_items import register_inventory_dashboard_items
 
 # Import UI schema modules to trigger registration
 import backend.app.base.ui_schemas
 import backend.app.crm.ui_schemas
+import backend.app.inventory.ui_schemas
 
 
 app = FastAPI()
@@ -63,12 +72,18 @@ app.include_router(base_dashboard_router.router, prefix="/base", tags=["dashboar
 app.include_router(crm_dashboard_router.router, prefix="/crm", tags=["dashboard"])
 app.include_router(customer_router.router, prefix="/crm/customer", tags=["customers"])
 app.include_router(crm_ui_schema_router.router, prefix="/crm/ui_schemas", tags=["ui_schemas_crm"])
+app.include_router(inventory_ui_schema_router.router, prefix="/inventory/ui_schemas", tags=["ui_schemas_inventory"])
 app.include_router(lead_router.router, prefix="/crm/leads", tags=["leads"])
 app.include_router(opportunity_router.router, prefix="/crm/opportunities", tags=["opportunities"])
 app.include_router(country_router.router, prefix="/base/country", tags=["countries"])
 app.include_router(address_router.router, prefix="/crm/addresses", tags=["addresses"])
 app.include_router(company_router.router, prefix="/base/company", tags=["company"])
 app.include_router(module_router.router, prefix="/base/modules", tags=["modules"])
+app.include_router(product_router.router, prefix="/inventory/products", tags=["inventory_products"])
+app.include_router(warehouse_router.router, prefix="/inventory/warehouses", tags=["inventory_warehouses"])
+app.include_router(location_router.router, prefix="/inventory/locations", tags=["inventory_locations"])
+app.include_router(inventory_movement_router.router, prefix="/inventory/movements", tags=["inventory_movements"])
+app.include_router(inventory_dashboard_router.router, prefix="/inventory", tags=["inventory_dashboard"])
 
 @app.on_event("startup")
 def on_startup():
@@ -78,11 +93,13 @@ def on_startup():
         create_initial_data(db)
         register_base_menus(db)
         register_crm_menus(db)
+        register_inventory_menus(db)
     finally:
         db.close()
     
     register_base_dashboard_items()
     register_crm_dashboard_items()
+    register_inventory_dashboard_items()
 
 @app.get("/")
 def read_root():

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, DateTime
 from sqlalchemy.orm import relationship
-from backend.app.base.models.base import Base
+from backend.app.database import Base
 from backend.app.crm.models.address import Address
 
 class Customer(Base):

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
 from sqlalchemy.orm import relationship
-from backend.app.base.models.base import Base
+from backend.app.database import Base
 from sqlalchemy import DateTime, func
 
 class Opportunity(Base):

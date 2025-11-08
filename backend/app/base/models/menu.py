@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from .base import Base
+from backend.app.database import Base
 
 class Menu(Base):
     __tablename__ = "menus"

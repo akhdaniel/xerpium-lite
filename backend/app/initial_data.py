@@ -9,6 +9,9 @@ from backend.app.base.models.country import Country
 from backend.app.crm.models.customer import Customer
 from backend.app.crm.models.address import Address
 from backend.app.base.models.module import Module
+from backend.app.inventory.models.product import Product
+from backend.app.inventory.models.warehouse import Warehouse
+from backend.app.inventory.models.location import Location
 from backend.app.base.security import get_password_hash
 
 def create_initial_data(db: Session):
@@ -54,13 +57,15 @@ def create_initial_data(db: Session):
     # Define all models for access rights
     model_names = [
         "User", "Group", "AccessRight", "Menu", "Customer", "Lead", "Opportunity", "Country",
-        "UserGroup", "GroupAccessRight", "GroupMenu", "Dashboard", "UI_Schema", "Module"
+        "UserGroup", "GroupAccessRight", "GroupMenu", "Dashboard", "UI_Schema", "Module",
+        "Product", "Warehouse", "Location", "movements"
     ]
 
     # Create initial Module data if it doesn't exist
     modules_data = [
         {"name": "base", "is_active": True},
         {"name": "crm", "is_active": True},
+        {"name": "inventory", "is_active": True},
     ]
 
     for module_data in modules_data:
@@ -72,6 +77,70 @@ def create_initial_data(db: Session):
             print(f"Module {module.name} created.")
         else:
             print(f"Module {module.name} already exists.")
+
+    # Create initial Warehouse data if it doesn't exist
+    warehouses_data = [
+        {"name": "Main Warehouse", "address": "123 Main St, Anytown"},
+        {"name": "Secondary Warehouse", "address": "456 Oak Ave, Otherville"},
+    ]
+
+    created_warehouses = {}
+    for warehouse_data in warehouses_data:
+        warehouse = db.query(Warehouse).filter(Warehouse.name == warehouse_data["name"]).first()
+        if not warehouse:
+            warehouse = Warehouse(**warehouse_data)
+            db.add(warehouse)
+            db.flush()
+            created_warehouses[warehouse.name] = warehouse
+            print(f"Warehouse {warehouse.name} created.")
+        else:
+            created_warehouses[warehouse.name] = warehouse
+            print(f"Warehouse {warehouse.name} already exists.")
+
+    # Create initial Location data if it doesn't exist
+    locations_data = [
+        {"name": "Aisle 1, Shelf 1", "warehouse_name": "Main Warehouse"},
+        {"name": "Aisle 1, Shelf 2", "warehouse_name": "Main Warehouse"},
+        {"name": "Zone A, Rack 1", "warehouse_name": "Secondary Warehouse"},
+    ]
+
+    created_locations = {}
+    for location_data in locations_data:
+        warehouse = created_warehouses.get(location_data["warehouse_name"])
+        if warehouse:
+            location = db.query(Location).filter(
+                Location.name == location_data["name"],
+                Location.warehouse_id == warehouse.id
+            ).first()
+            if not location:
+                location = Location(name=location_data["name"], warehouse_id=warehouse.id)
+                db.add(location)
+                db.flush()
+                created_locations[location.name] = location
+                print(f"Location {location.name} in {warehouse.name} created.")
+            else:
+                created_locations[location.name] = location
+                print(f"Location {location.name} in {warehouse.name} already exists.")
+
+    # Create initial Product data if it doesn't exist
+    products_data = [
+        {"name": "Laptop", "description": "High performance laptop", "price": 1200.00, "is_active": True},
+        {"name": "Mouse", "description": "Wireless mouse", "price": 25.00, "is_active": True},
+        {"name": "Keyboard", "description": "Mechanical keyboard", "price": 75.00, "is_active": False},
+    ]
+
+    created_products = {}
+    for product_data in products_data:
+        product = db.query(Product).filter(Product.name == product_data["name"]).first()
+        if not product:
+            product = Product(**product_data)
+            db.add(product)
+            db.flush()
+            created_products[product.name] = product
+            print(f"Product {product.name} created.")
+        else:
+            created_products[product.name] = product
+            print(f"Product {product.name} already exists.")
 
     # Create initial Country data if it doesn't exist
     countries_data = [

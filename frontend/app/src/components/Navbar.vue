@@ -57,6 +57,7 @@ const fetchMenuItems = async (module) => {
       throw new Error('Failed to fetch menu items')
     }
     menuItems.value = await response.json()
+    console.log('Fetched menu items:', menuItems.value)
   } catch (error) {
     if (error.message !== 'Unauthorized') {
       console.error('Error fetching menu items:', error)

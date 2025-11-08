@@ -1,12 +1,9 @@
 from sqlalchemy import Column, Integer, String
 from backend.app.database import Base
 
-class AccessRight(Base):
-    __tablename__ = "access_rights"
+class Warehouse(Base):
+    __tablename__ = "warehouses"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True, nullable=False)
-    description = Column(String, nullable=True)
-
-    def __repr__(self):
-        return f"<AccessRight(id={self.id}, name='{self.name}')>"
+    address = Column(String, nullable=True)

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from .base import Base
+from backend.app.database import Base
 
 class GroupMenu(Base):
     __tablename__ = "group_menus"

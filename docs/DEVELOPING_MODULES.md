@@ -357,3 +357,4 @@ def on_startup():
 The application includes a `Module` management system. You can activate or deactivate modules via the "Modules" menu item under "Settings" in the UI. Deactivating a module should prevent its features from being accessible, though the current implementation might require further logic to fully disable routes or UI elements based on the `is_active` status.
 
 ---
+
