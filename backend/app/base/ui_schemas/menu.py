@@ -110,6 +110,15 @@ def register_base_menus(db: Session):
         "order": 5,
         "module": "base"
     })
+    register_menu_item(db, "base", {
+        "id": 102,
+        "name": "UI Schemas",
+        "path": "/ui_schemas",
+        "icon": "ui-schemas-icon",
+        "parent_id": 10,
+        "order": 6,
+        "module": "base"
+    })
 
 register_ui_schema(MenuUISchema())
 

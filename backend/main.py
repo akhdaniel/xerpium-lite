@@ -22,22 +22,15 @@ from backend.app.crm.routers import opportunity as opportunity_router
 from backend.app.base.routers import country as country_router
 from backend.app.crm.routers import crm_dashboard as crm_dashboard_router
 from backend.app.crm.routers import address as address_router
-from .app.base.ui_schemas.menu import register_base_menus, MenuUISchema
+from backend.app.base.ui_schemas.menu import register_base_menus
 from backend.app.crm.ui_schemas.menu import register_crm_menus
-from backend.app.crm.ui_schemas.customer import CustomerUISchema
-from backend.app.crm.ui_schemas.lead import LeadUISchema
-from backend.app.crm.ui_schemas.opportunity import OpportunityUISchema
-from backend.app.base.ui_schemas.country import CountryUISchema
-from backend.app.base.ui_schemas.company import CompanyUISchema
-from .app.base.ui_schemas.user import UserUISchema
-from .app.base.ui_schemas.group import GroupUISchema
-from .app.base.ui_schemas.access_right import AccessRightUISchema
-from .app.base.ui_schemas.group_access_right import GroupAccessRightUISchema
-from .app.base.ui_schemas.group_menu import GroupMenuUISchema
-from .app.base.ui_schemas.user_group import UserGroupUISchema
-from .app.base.dashboard_items import register_base_dashboard_items
+from backend.app.base.dashboard_items import register_base_dashboard_items
 from backend.app.crm.dashboard_items import register_crm_dashboard_items
-from backend.app.base.ui_schema_registry import register_ui_schema
+
+# Import UI schema modules to trigger registration
+import backend.app.base.ui_schemas
+import backend.app.crm.ui_schemas
+
 
 app = FastAPI()
 
@@ -88,20 +81,6 @@ def on_startup():
     
     register_base_dashboard_items()
     register_crm_dashboard_items()
-
-    # Register UI Schemas
-    register_ui_schema(UserUISchema())
-    register_ui_schema(GroupUISchema())
-    register_ui_schema(AccessRightUISchema())
-    register_ui_schema(GroupAccessRightUISchema())
-    register_ui_schema(GroupMenuUISchema())
-    register_ui_schema(UserGroupUISchema())
-    register_ui_schema(MenuUISchema())
-    register_ui_schema(CustomerUISchema())
-    register_ui_schema(LeadUISchema())
-    register_ui_schema(OpportunityUISchema())
-    register_ui_schema(CountryUISchema())
-    register_ui_schema(CompanyUISchema())
 
 @app.get("/")
 def read_root():
