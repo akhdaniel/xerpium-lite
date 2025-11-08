@@ -67,16 +67,18 @@
                    :id="field.field"
                    class="form-control"
                    v-model="selectedRecord[field.field]"
-                   :required="field.required">
+                   :required="field.required"
+                   v-bind="field.props">
             <EmailInput v-else-if="field.type === 'email'"
                         :id="field.field"
                         v-model="selectedRecord[field.field]"
                         :required="field.required" />
             <textarea v-else-if="field.type === 'textarea'"
                       :id="field.field"
-                   class="form-control"
+                      class="form-control"
                       v-model="selectedRecord[field.field]"
-                      :required="field.required"></textarea>
+                      :required="field.required"
+                      v-bind="field.props"></textarea>
             <Many2oneSelect v-else-if="field.type === 'many2one'"
                             :moduleName="field.module_name"
                             :relatedModel="field.related_model"

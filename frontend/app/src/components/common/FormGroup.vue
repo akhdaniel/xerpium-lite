@@ -18,16 +18,18 @@
                  :type="getFieldSchema(child.field).type"
                  :id="child.field"
                  v-model="selectedRecord[child.field]"
-                 :required="getFieldSchema(child.field).required">
+                 :required="getFieldSchema(child.field).required"
+                 v-bind="getFieldSchema(child.field).props">
           <EmailInput v-else-if="getFieldSchema(child.field).type === 'email'"
                       :id="child.field"
                       v-model="selectedRecord[child.field]"
                       :required="getFieldSchema(child.field).required" />
           <textarea v-else-if="getFieldSchema(child.field).type === 'textarea'"
                     :id="child.field"
-                 class="form-control"
+                    class="form-control"
                     v-model="selectedRecord[child.field]"
-                    :required="getFieldSchema(child.field).required"></textarea>
+                    :required="getFieldSchema(child.field).required"
+                    v-bind="getFieldSchema(child.field).props"></textarea>
           <Many2oneSelect v-else-if="getFieldSchema(child.field).type === 'many2one'"
                           :moduleName="getFieldSchema(child.field).module_name"
                           :relatedModel="getFieldSchema(child.field).related_model"

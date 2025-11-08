@@ -19,7 +19,7 @@ class UISchemasUISchema(BaseUISchema):
                 "form": {
                     "title": "UI Schema Details",
                     "fields": [
-                        {"field": "schema_json", "label": "Schema JSON", "type": "textarea", "readonly": True, "props": {"rows": 40}},
+                        {"field": "schema_json", "label": "Schema JSON", "type": "textarea", "props": {"rows": 40, "readonly": True}},
                     ]
                 }
             }
