@@ -5,7 +5,7 @@ from backend.app.base.schemas.menu import MenuCreate, MenuUpdate, Menu
 
 def register_menu_item(db: Session, module: str, menu_item_data: Dict[str, Any]):
     # Check if menu item with this ID already exists
-    existing_menu = menu_service.get_menu(db, menu_path=menu_item_data["path"])
+    existing_menu = menu_service.get_menu(db, menu_id=menu_item_data["id"])
     if existing_menu:
         # Update existing menu item
         menu_update = MenuUpdate(**menu_item_data)

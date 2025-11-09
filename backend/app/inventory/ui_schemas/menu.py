@@ -4,7 +4,7 @@ from backend.app.base.menu_registry import register_menu_item
 def register_inventory_menus(db: Session):
     register_menu_item(db, "inventory", {
         "id": 200, # Use a unique ID for your module's menus
-        "name": "Inventory Dashboard",
+        "name": "Dashboard",
         "path": "/inventory/dashboard",
         "icon": "inventory-dashboard-icon",
         "parent_id": None,

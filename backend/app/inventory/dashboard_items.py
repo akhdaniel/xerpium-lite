@@ -1,35 +1,29 @@
-from typing import List, Dict, Any
+from sqlalchemy.orm import Session
+from backend.app.base.dashboard_registry import register_dashboard_item
+from backend.app.crm.models.customer import Customer
 
-dashboard_items: List[Dict[str, Any]] = []
+def get_customer_count(db: Session):
+    return db.query(Customer).count()
 
-def register_dashboard_item(item: Dict[str, Any]):
-    dashboard_items.append(item)
-
-def get_dashboard_items() -> List[Dict[str, Any]]:
-    return dashboard_items
+def get_dummy_table_data(db):
+    return {
+        "headers": ["Name", "Value"],
+        "rows": [
+            ["Dummy 1", 100],
+            ["Dummy 2", 200]
+        ]
+    }
 
 def register_inventory_dashboard_items():
-    register_dashboard_item({
-        "id": "inventory_products_count",
-        "title": "Total Products",
-        "type": "metric",
-        "data_url": "/inventory/dashboard/products_count",
-        "icon": "bi-box-seam",
-        "color": "primary"
+    register_dashboard_item("inventory", {
+        "id": "customer_count",
+        "title": "Number of Vendor",
+        "type": "kpi_card",
+        "service": get_customer_count,
     })
-    register_dashboard_item({
-        "id": "inventory_warehouses_count",
-        "title": "Total Warehouses",
-        "type": "metric",
-        "data_url": "/inventory/dashboard/warehouses_count",
-        "icon": "bi-building",
-        "color": "info"
-    })
-    register_dashboard_item({
-        "id": "inventory_locations_count",
-        "title": "Total Locations",
-        "type": "metric",
-        "data_url": "/inventory/dashboard/locations_count",
-        "icon": "bi-geo-alt",
-        "color": "success"
+    register_dashboard_item("inventory", {
+        "id": "crm_dummy_item",
+        "title": "Inventory Dummy Table",
+        "type": "table",
+        "service": get_dummy_table_data,
     })
