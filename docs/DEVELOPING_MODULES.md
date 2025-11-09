@@ -352,7 +352,62 @@ def on_startup():
     # ...
 ```
 
-### 10. Module Activation/Deactivation
+### 10. Add Dashboard Items (Optional)
+
+You can add dashboard items for your module that will be displayed on the main dashboard. This is a great way to provide at-a-glance information. As a convention, you should add dummy or sample dashboard items to demonstrate the module's capabilities, especially during initial development.
+
+Create a `dashboard_items.py` file in your module's root directory (e.g., `backend/app/inventory/dashboard_items.py`).
+
+In this file, you'll define service functions to fetch data and then register your dashboard items. Refer to `backend/app/crm/dashboard_items.py` for an example.
+
+For the `inventory` module, `backend/app/inventory/dashboard_items.py` would look like this:
+
+```python
+from sqlalchemy.orm import Session
+from backend.app.base.dashboard_registry import register_dashboard_item
+from backend.app.inventory.models.product import Product
+
+def get_product_count(db: Session):
+    return db.query(Product).count()
+
+def get_dummy_inventory_table(db: Session):
+    return {
+        "headers": ["Item", "Stock"],
+        "rows": [
+            ["Sample Item A", 150],
+            ["Sample Item B", 300]
+        ]
+    }
+
+def register_inventory_dashboard_items():
+    register_dashboard_item("inventory", {
+        "id": "product_count",
+        "title": "Number of Products",
+        "type": "kpi_card",
+        "service": get_product_count,
+    })
+    register_dashboard_item("inventory", {
+        "id": "inventory_dummy_table",
+        "title": "Inventory Dummy Table",
+        "type": "table",
+        "service": get_dummy_inventory_table,
+    })
+```
+
+Finally, import and call this registration function in `backend/main.py`'s `on_startup` event.
+
+```python
+# In backend/main.py
+from backend.app.inventory.dashboard_items import register_inventory_dashboard_items # Add this import
+
+@app.on_event("startup")
+def on_startup():
+    # ... (other startup code)
+    
+    register_inventory_dashboard_items()
+```
+
+### 11. Module Activation/Deactivation
 
 The application includes a `Module` management system. You can activate or deactivate modules via the "Modules" menu item under "Settings" in the UI. Deactivating a module should prevent its features from being accessible, though the current implementation might require further logic to fully disable routes or UI elements based on the `is_active` status.
 
