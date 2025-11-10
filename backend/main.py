@@ -29,17 +29,24 @@ from backend.app.inventory.routers import warehouse as warehouse_router
 from backend.app.inventory.routers import location as location_router
 from backend.app.inventory.routers import inventory_movement as inventory_movement_router
 from backend.app.inventory.routers import inventory_dashboard as inventory_dashboard_router
+from backend.app.ai_module_builder.routers import dashboard_router as ai_module_builder_dashboard_router
+from backend.app.ai_module_builder.routers import ui_schema_router as ai_module_builder_ui_schema_router
+from backend.app.ai_module_builder.routers import generation_log as generation_log_router
+# from backend.app.ai_module_builder.routers import generator_router as generator_router
 from backend.app.base.ui_schemas.menu import register_base_menus
 from backend.app.crm.ui_schemas.menu import register_crm_menus
 from backend.app.inventory.ui_schemas.menu import register_inventory_menus
+from backend.app.ai_module_builder.ui_schemas.menu import register_ai_module_builder_menus
 from backend.app.base.dashboard_items import register_base_dashboard_items
 from backend.app.crm.dashboard_items import register_crm_dashboard_items
 from backend.app.inventory.dashboard_items import register_inventory_dashboard_items
+from backend.app.ai_module_builder.dashboard_items import register_ai_module_builder_dashboard_items
 
 # Import UI schema modules to trigger registration
-import backend.app.base.ui_schemas
-import backend.app.crm.ui_schemas
-import backend.app.inventory.ui_schemas
+# import backend.app.base.ui_schemas
+# import backend.app.crm.ui_schemas
+# import backend.app.inventory.ui_schemas
+# import backend.app.ai_module_builder.ui_schemas
 
 
 app = FastAPI()
@@ -84,6 +91,10 @@ app.include_router(warehouse_router.router, prefix="/inventory/warehouses", tags
 app.include_router(location_router.router, prefix="/inventory/locations", tags=["inventory_locations"])
 app.include_router(inventory_movement_router.router, prefix="/inventory/movements", tags=["inventory_movements"])
 app.include_router(inventory_dashboard_router.router, prefix="/inventory", tags=["inventory_dashboard"])
+app.include_router(ai_module_builder_dashboard_router.router, prefix="/ai_module_builder", tags=["ai_module_builder_dashboard"])
+app.include_router(ai_module_builder_ui_schema_router.router, prefix="/ai_module_builder/ui_schemas", tags=["ai_module_builder_ui_schema"])
+app.include_router(generation_log_router.router, prefix="/ai_module_builder/generation_log", tags=["ai_module_builder_generation_logs"])
+# app.include_router(generator_router.router, prefix="/ai_module_builder/generator", tags=["ai_module_builder_generator"])
 
 @app.on_event("startup")
 def on_startup():
@@ -94,12 +105,14 @@ def on_startup():
         register_base_menus(db)
         register_crm_menus(db)
         register_inventory_menus(db)
+        register_ai_module_builder_menus(db)
     finally:
         db.close()
     
     register_base_dashboard_items()
     register_crm_dashboard_items()
     register_inventory_dashboard_items()
+    register_ai_module_builder_dashboard_items()
 
 @app.get("/")
 def read_root():

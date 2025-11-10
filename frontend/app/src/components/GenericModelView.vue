@@ -4,6 +4,15 @@
       <BCol lg="8" md="8"  xs="12" sm="12" class="text-start">
         <button class="btn btn-secondary btn-sm" @click="createNew">New</button>
         <button v-if="showForm" type="submit" form="main-form" class="btn btn-primary btn-sm ms-2">Save</button>
+        <template v-if="showForm && uiSchema.views.form.actions">
+          <button v-for="action in uiSchema.views.form.actions"
+                  :key="action.label"
+                  type="button"
+                  class="btn btn-info btn-sm ms-2"
+                  @click="handleAction(action)">
+            {{ action.label }}
+          </button>
+        </template>
         <button v-if="showForm" type="button" class="btn btn-secondary btn-sm ms-2" @click="closeForm">Back</button>
         <button v-if="selectedRecords.length > 0 && !showForm" class="btn btn-danger btn-sm ms-2" @click="deleteSelectedRecords"><i class="bi bi-trash"></i> Delete Selected</button>
                         <span v-if="showForm" class="pt-2 px-2 text-bold fw-bold" style="text-align:left">
@@ -425,6 +434,17 @@ const deleteSelectedRecords = async () => {
     loading.value = false;
   }
 };
+
+const handleAction = async(action)=>{
+  console.log('handleAction', action)
+  const response = await authenticatedFetch(`http://localhost:8000${action.route}`,{
+      method: action.method,
+      headers: {
+        'Content-Type': 'application/json',
+      },    
+  })
+
+}
 
 watch(() => props.modelName, () => {
   if (props.modelName) {

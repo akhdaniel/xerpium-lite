@@ -9,6 +9,7 @@ Each module should reside in its own directory under `backend/app/` (e.g., `back
 ```
 your_module_name/
 ├── __init__.py
+├── dashboard_items.py
 ├── models/
 │   ├── __init__.py
 │   └── your_model.py
@@ -20,11 +21,11 @@ your_module_name/
 │   └── your_service.py
 ├── routers/
 │   ├── __init__.py
-│   └── your_router.py
+│   ├── your_router.py
+│   └── your_dashboard_router.py
 ├── ui_schemas/
 │   ├── __init__.py
 │   └── your_ui_schema.py
-├── dashboard_items.py (Optional)
 ```
 
 ## Step-by-Step Guide to Creating a New Module
@@ -309,28 +310,34 @@ import backend.app.inventory.ui_schemas # Add this line
 
 ### 9. Add Menu Items for Your Module (`backend/app/inventory/ui_schemas/menu.py`)
 
-Create a `menu.py` file in your module's `ui_schemas` directory to register menu items. For example, `backend/app/inventory/ui_schemas/menu.py`:
+Create a `menu.py` file in your module's `ui_schemas` directory to register menu items. All menu items for a module should be registered as top-level items (i.e., with `parent_id: None`).
+
+By convention, the "Dashboard" menu item should always be first (`order: 0`).
+
+For example, `backend/app/inventory/ui_schemas/menu.py`:
 
 ```python
 from sqlalchemy.orm import Session
 from backend.app.base.menu_registry import register_menu_item
 
 def register_inventory_menus(db: Session):
+    # Register the Dashboard menu item first
     register_menu_item(db, "inventory", {
         "id": 200, # Use a unique ID for your module's menus
         "name": "Inventory Dashboard",
         "path": "/inventory/dashboard",
-        "icon": "inventory-dashboard-icon",
+        "icon": "dashboard-icon",
         "parent_id": None,
         "order": 0,
         "module": "inventory"
     })
+    # Register other top-level menu items
     register_menu_item(db, "inventory", {
         "id": 201,
         "name": "Products",
         "path": "/inventory/products",
         "icon": "products-icon",
-        "parent_id": 200, # Make it a sub-item of the dashboard or another root item
+        "parent_id": None,
         "order": 1,
         "module": "inventory"
     })
@@ -339,26 +346,28 @@ def register_inventory_menus(db: Session):
 Remember to import and call this registration function in `backend/main.py`'s `on_startup` event:
 
 ```python
-from backend.app.inventory.ui_schemas.menu import register_inventory_menus # Add this import
+# In backend/main.py
+from backend.app.inventory.ui_schemas.menu import register_inventory_menus
 
 @app.on_event("startup")
 def on_startup():
     # ...
     try:
+        db = SessionLocal()
         # ...
-        register_inventory_menus(db) # Call your new module's menu registration
+        register_inventory_menus(db)
     finally:
         db.close()
     # ...
 ```
 
-### 10. Add Dashboard Items (Optional)
+### 10. Create the Module Dashboard
 
-You can add dashboard items for your module that will be displayed on the main dashboard. This is a great way to provide at-a-glance information. As a convention, you should add dummy or sample dashboard items to demonstrate the module's capabilities, especially during initial development.
+Every module must have a dashboard page that displays key information. This involves creating dashboard items and a dedicated router.
 
-Create a `dashboard_items.py` file in your module's root directory (e.g., `backend/app/inventory/dashboard_items.py`).
+#### 10.1. Create Dashboard Items
 
-In this file, you'll define service functions to fetch data and then register your dashboard items. Refer to `backend/app/crm/dashboard_items.py` for an example.
+Create a `dashboard_items.py` file in your module's root directory (e.g., `backend/app/inventory/dashboard_items.py`). In this file, you'll define service functions to fetch data and then register your dashboard items.
 
 For the `inventory` module, `backend/app/inventory/dashboard_items.py` would look like this:
 
@@ -394,17 +403,60 @@ def register_inventory_dashboard_items():
     })
 ```
 
-Finally, import and call this registration function in `backend/main.py`'s `on_startup` event.
+Import and call this registration function in `backend/main.py`'s `on_startup` event:
 
 ```python
 # In backend/main.py
-from backend.app.inventory.dashboard_items import register_inventory_dashboard_items # Add this import
+from backend.app.inventory.dashboard_items import register_inventory_dashboard_items
 
 @app.on_event("startup")
 def on_startup():
     # ... (other startup code)
     
     register_inventory_dashboard_items()
+```
+
+#### 10.2. Create Dashboard Router
+
+Create a dashboard router for your module (e.g., `backend/app/inventory/routers/inventory_dashboard.py`). This router is mostly boilerplate code that fetches and serves the dashboard items you registered. You can copy this from another module like `crm` and change the module name.
+
+```python
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from typing import List, Dict, Any
+
+from backend.app.base.dashboard_registry import get_dashboard_items_by_module
+from backend.app.database import get_db
+from backend.app.base.dependencies import has_permission
+
+router = APIRouter()
+
+@router.get("/dashboard", response_model=List[Dict[str, Any]], dependencies=[Depends(has_permission("Dashboard", "read"))])
+def get_dashboard_items(db: Session = Depends(get_db)):
+    # Change "inventory" to your module's name
+    items = get_dashboard_items_by_module("inventory")
+    results = []
+    for item in items:
+        value = item["service"](db)
+        results.append({
+            "id": item["id"],
+            "title": item["title"],
+            "value": value,
+            "type": item["type"],
+            "chart_type": item.get("chart_type"),
+            "module": "inventory" # Change this to your module's name
+        })
+    return results
+```
+
+Finally, register this new router in `backend/main.py`:
+
+```python
+# In backend/main.py
+from backend.app.inventory.routers import inventory_dashboard as inventory_dashboard_router
+
+# ... in the router inclusion section
+app.include_router(inventory_dashboard_router.router, prefix="/inventory", tags=["inventory_dashboard"])
 ```
 
 ### 11. Module Activation/Deactivation

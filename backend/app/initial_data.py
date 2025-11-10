@@ -12,6 +12,7 @@ from backend.app.base.models.module import Module
 from backend.app.inventory.models.product import Product
 from backend.app.inventory.models.warehouse import Warehouse
 from backend.app.inventory.models.location import Location
+from backend.app.ai_module_builder.models.generation_log import GenerationLog
 from backend.app.base.security import get_password_hash
 
 def create_initial_data(db: Session):
@@ -58,7 +59,7 @@ def create_initial_data(db: Session):
     model_names = [
         "User", "Group", "AccessRight", "Menu", "Customer", "Lead", "Opportunity", "Country",
         "UserGroup", "GroupAccessRight", "GroupMenu", "Dashboard", "UI_Schema", "Module",
-        "Product", "Warehouse", "Location", "movements"
+        "Product", "Warehouse", "Location", "movements", "GenerationLog"
     ]
 
     # Create initial Module data if it doesn't exist
@@ -66,6 +67,7 @@ def create_initial_data(db: Session):
         {"name": "base", "is_active": True},
         {"name": "crm", "is_active": True},
         {"name": "inventory", "is_active": True},
+        {"name": "ai_module_builder", "is_active": True},
     ]
 
     for module_data in modules_data:

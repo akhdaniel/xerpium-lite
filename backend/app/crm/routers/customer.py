@@ -10,6 +10,7 @@ router = APIRouter()
 
 @router.post("/", response_model=Customer)
 def create_customer(customer: CustomerCreate, db: Session = Depends(get_db)):
+ 
     db_customer = customer_service.get_customer_by_email(db, email=customer.email)
     if db_customer:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -22,6 +23,7 @@ def read_customers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db
 
 @router.get("/{customer_id}", response_model=Customer)
 def read_customer(customer_id: int, db: Session = Depends(get_db)):
+    
     db_customer = customer_service.get_customer(db, customer_id=customer_id)
     if db_customer is None:
         raise HTTPException(status_code=404, detail="Customer not found")
