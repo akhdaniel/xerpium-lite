@@ -295,6 +295,43 @@ class ProductUISchema(BaseUISchema):
 
 register_ui_schema(ProductUISchema())
 ```
+### Actions in UI Forms
+
+You can define custom action buttons for your forms by including an `actions` array within the `form` object of your UI schema. These buttons will appear to the left of the "Back" button in the frontend.
+
+Each action object should have the following properties:
+
+-   `label` (string, required): The text displayed on the button.
+-   `route` (string, required): The API endpoint or route to call when the button is clicked.
+-   `action_type` (string, required): The type of action. Currently supported:
+    -   `"api_call"`: Makes an API call to the specified `route`.
+-   `method` (string, optional): The HTTP method for `api_call` actions (e.g., `"POST"`, `"GET"`, `"PUT"`, `"DELETE"`). Defaults to `"POST"`.
+
+Example:
+
+```json
+                "form": {
+                    "title": "Product Form",
+                    "fields": [
+                        // ... fields definition ...
+                    ],
+                    "actions": [
+                        {
+                            "label": "Process Product",
+                            "route": "/inventory/products/process",
+                            "action_type": "api_call",
+                            "method": "POST"
+                        },
+                        {
+                            "label": "View Report",
+                            "route": "/inventory/products/report",
+                            "action_type": "redirect" // Example of a future action type
+                        }
+                    ]
+                }
+```
+
+Actions's route should be present in the corresponding object's services defined above.
 
 Remember to import your new UI schema in `backend/app/inventory/ui_schemas/__init__.py`:
 

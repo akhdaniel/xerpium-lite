@@ -94,7 +94,6 @@ app.include_router(inventory_dashboard_router.router, prefix="/inventory", tags=
 app.include_router(ai_module_builder_dashboard_router.router, prefix="/ai_module_builder", tags=["ai_module_builder_dashboard"])
 app.include_router(ai_module_builder_ui_schema_router.router, prefix="/ai_module_builder/ui_schemas", tags=["ai_module_builder_ui_schema"])
 app.include_router(generation_log_router.router, prefix="/ai_module_builder/generation_log", tags=["ai_module_builder_generation_logs"])
-app.include_router(generator_router.router, prefix="/ai_module_builder/generator", tags=["ai_module_builder_generator"])
 
 @app.on_event("startup")
 def on_startup():
