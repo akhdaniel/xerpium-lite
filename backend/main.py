@@ -32,7 +32,7 @@ from backend.app.inventory.routers import inventory_dashboard as inventory_dashb
 from backend.app.ai_module_builder.routers import dashboard_router as ai_module_builder_dashboard_router
 from backend.app.ai_module_builder.routers import ui_schema_router as ai_module_builder_ui_schema_router
 from backend.app.ai_module_builder.routers import generation_log as generation_log_router
-# from backend.app.ai_module_builder.routers import generator_router as generator_router
+from backend.app.ai_module_builder.routers import generator as generator_router
 from backend.app.base.ui_schemas.menu import register_base_menus
 from backend.app.crm.ui_schemas.menu import register_crm_menus
 from backend.app.inventory.ui_schemas.menu import register_inventory_menus
@@ -94,7 +94,7 @@ app.include_router(inventory_dashboard_router.router, prefix="/inventory", tags=
 app.include_router(ai_module_builder_dashboard_router.router, prefix="/ai_module_builder", tags=["ai_module_builder_dashboard"])
 app.include_router(ai_module_builder_ui_schema_router.router, prefix="/ai_module_builder/ui_schemas", tags=["ai_module_builder_ui_schema"])
 app.include_router(generation_log_router.router, prefix="/ai_module_builder/generation_log", tags=["ai_module_builder_generation_logs"])
-# app.include_router(generator_router.router, prefix="/ai_module_builder/generator", tags=["ai_module_builder_generator"])
+app.include_router(generator_router.router, prefix="/ai_module_builder/generator", tags=["ai_module_builder_generator"])
 
 @app.on_event("startup")
 def on_startup():

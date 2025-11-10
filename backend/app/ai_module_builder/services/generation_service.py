@@ -79,9 +79,9 @@ def _generate_router_code(module_name: str, model: ModelInfo) -> str:
     model_name_pascal = model.name.capitalize()
     model_name_lower = model.name.lower()
     path_param_name = f"{model_name_lower}_id"
-    path_single = f"/{{\{path_param_name}}}"
+    path_single = f"/{{\"{path_param_name}\"}}"
 
-    return f"""from fastapi import APIRouter, Depends, HTTPException\nfrom sqlalchemy.orm import Session\nfrom typing import List\n\nfrom backend.app.database import get_db\nfrom backend.app.{module_name}.schemas.{model_name_lower} import {model_name_pascal}, {model_name_pascal}Create, {model_name_pascal}Update\nfrom backend.app.{module_name}.services import {model_name_lower} as {model_name_lower}_service\n\nrouter = APIRouter()\n\n@router.post("/", response_model={model_name_pascal})\ndef create_{model_name_lower}_endpoint({model_name_lower}: {model_name_pascal}Create, db: Session = Depends(get_db)):\n    return {model_name_lower}_service.create_{model_name_lower}(db=db, {model_name_lower}={model_name_lower})\n\n@router.get("/", response_model=List[{model_name_pascal}])\ndef read_{model_name_lower}s_endpoint(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):\n    {model_name_lower}s = {model_name_lower}_service.get_{model_name_lower}s(db, skip=skip, limit=limit)\n    return {model_name_lower}s\n\n@router.get("{path_single}", response_model={model_name_pascal})\ndef read_{model_name_lower}_endpoint({model_name_lower}_id: int, db: Session = Depends(get_db)):\n    db_{model_name_lower} = {model_name_lower}_service.get_{model_name_lower}(db, {model_name_lower}_id={model_name_lower}_id)\n    if db_{model_name_lower} is None:\n        raise HTTPException(status_code=404, detail=\"{model_name_pascal} not found\")\n    return db_{model_name_lower}\n\n@router.put("{path_single}", response_model={model_name_pascal})\ndef update_{model_name_lower}_endpoint({model_name_lower}_id: int, {model_name_lower}: {model_name_pascal}Update, db: Session = Depends(get_db)):\n    db_{model_name_lower} = {model_name_lower}_service.update_{model_name_lower}(db, {model_name_lower}_id={model_name_lower}_id, {model_name_lower}={model_name_lower})\n    if db_{model_name_lower} is None:\n        raise HTTPException(status_code=404, detail=\"{model_name_pascal} not found\")\n    return db_{model_name_lower}\n\n@router.delete("{path_single}", response_model={model_name_pascal})\ndef delete_{model_name_lower}_endpoint({model_name_lower}_id: int, db: Session = Depends(get_db)):\n    db_{model_name_lower} = {model_name_lower}_service.delete_{model_name_lower}(db, {model_name_lower}_id={model_name_lower}_id)\n    if db_{model_name_lower} is None:\n        raise HTTPException(status_code=404, detail=\"{model_name_pascal} not found\")\n    return db_{model_name_lower}\n"""
+    return f"""from fastapi import APIRouter, Depends, HTTPException\nfrom sqlalchemy.orm import Session\nfrom typing import List\n\nfrom backend.app.database import get_db\nfrom backend.app.{module_name}.schemas.{model_name_lower} import {model_name_pascal}, {model_name_pascal}Create, {model_name_pascal}Update\nfrom backend.app.{module_name}.services import {model_name_lower} as {model_name_lower}_service\n\nrouter = APIRouter()\n\n@router.post("/", response_model={model_name_pascal})\ndef create_{model_name_lower}_endpoint({model_name_lower}: {model_name_pascal}Create, db: Session = Depends(get_db)):\n    return {model_name_lower}_service.create_{model_name_lower}(db=db, {model_name_lower}={model_name_lower})\n\n@router.get("/", response_model=List[{model_name_pascal}])\ndef read_{model_name_lower}s_endpoint(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):\n    {model_name_lower}s = {model_name_lower}_service.get_{model_name_lower}s(db, skip=skip, limit=limit)\n    return {model_name_lower}s\n\n@router.get("{path_single}", response_model={model_name_pascal})\ndef read_{model_name_lower}_endpoint({model_name_lower}_id: int, db: Session = Depends(get_db)):\n    db_{model_name_lower} = {model_name_lower}_service.get_{model_name_lower}(db, {model_name_lower}_id={model_name_lower}_id)\n    if db_{model_name_lower} is None:\n        raise HTTPException(status_code=404, detail=\"{model_name_pascal} not found\")\n    return db_{model_name_lower}\n\n@router.put("{path_single}", response_model={model_name_pascal})\ndef update_{model_name_lower}_endpoint({model_name_lower}_id: int, {model_name_lower}: {model_name_pascal}Update, db: Session = Depends(get_db)):\n    db_{model_name_lower} = {model_name_lower}_service.update_{model_name_lower}(db, {model_name_lower}_id={model_name_lower}_id, {model_name_lower}={model_name_lower})\n    if db_{model_name_lower} is None:\n        raise HTTPException(status_code=404, detail=\"{model_name_pascal} not found\")\n    return db_{model_name_lower}\n\n@router.delete("{path_single}")\ndef delete_{model_name_lower}_endpoint({model_name_lower}_id: int, db: Session = Depends(get_db)):\n    success = {model_name_lower}_service.delete_{model_name_lower}(db, {model_name_lower}_id={model_name_lower}_id)\n    if not success:\n        raise HTTPException(status_code=404, detail=\"{model_name_pascal} not found\")\n    return {{\"message\": \"{model_name_pascal} deleted successfully\"}}\n"""
 
 def _generate_ui_schema_code(module_name: str, model: ModelInfo) -> str:
     model_name_pascal = model.name.capitalize()
@@ -123,7 +123,7 @@ def generate_module_files(db: Session, spec: ModuleSpecification):
     
     models = _parse_specification(spec.specification)
     if not models:
-        return {{"error": "Could not parse specification. Please use the format: model named 'ModelName' with fields: name (type), ..."}}
+        return {"error": "Could not parse specification. Please use the format: model named 'ModelName' with fields: name (type), ..."}
 
     base_path = f"backend/app/{module_name}"
     subdirectories = ["models", "schemas", "services", "routers", "ui_schemas"]
@@ -161,7 +161,7 @@ def generate_module_files(db: Session, spec: ModuleSpecification):
     )
     generation_log_service.create_generation_log(db, log=log_entry)
 
-    return {{
+    return {
         "message": f"Module '{module_name}' generated successfully!",
         "generated_files": generated_files,
         "next_steps": [
@@ -172,4 +172,12 @@ def generate_module_files(db: Session, spec: ModuleSpecification):
             "5. Create and register a menu item for the new module.",
             "6. Restart the backend server to apply changes."
         ]
-    }}
+    }
+
+def generate_module_by_log_id(db: Session, generation_log_id: int):
+    log_entry = generation_log_service.get_generation_log(db, generation_log_id)
+    if not log_entry:
+        raise ValueError(f"Generation log with ID {generation_log_id} not found.")
+
+    module_spec = ModuleSpecification(name=log_entry.module_name, specification=log_entry.specification)
+    return generate_module_files(db, module_spec)

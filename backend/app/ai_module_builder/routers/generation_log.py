@@ -34,19 +34,3 @@ def update_lead(log_id: int, log: GenerationLogUpdate, db: Session = Depends(get
         raise HTTPException(status_code=404, detail="GenerationLog not found")
     return db_log
 
-@router.post("/generate", response_model=ModelInfo) # Use the Pydantic ModelInfo
-def generate_module_endpoint(
-    spec: ModuleSpecification,
-    db: Session = Depends(get_db)
-):
-    """
-    Endpoint to generate a new module from a specification.
-    This is triggered by the 'Save' action in the GenericModelView.
-    """
-    result = generation_log_service.generate_module_files(db, spec)
-    # The GenericModelView expects the created object back.
-    # We don't really have one. We'll return the first model info as a proxy.
-    models = generation_log_service._parse_specification(spec.specification)
-    if models:
-        return models[0]
-    return {}

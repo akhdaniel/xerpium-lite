@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 
 from backend.app.base.dashboard_registry import get_dashboard_items_by_module
 from backend.app.database import get_db
 from backend.app.base.dependencies import has_permission
+
 
 router = APIRouter()
 
@@ -24,3 +25,5 @@ def get_dashboard_items(db: Session = Depends(get_db)):
             "module": "ai_module_builder"
         })
     return results
+
+

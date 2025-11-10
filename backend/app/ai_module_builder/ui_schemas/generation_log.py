@@ -40,7 +40,7 @@ class GeneratorUISchema(BaseUISchema):
                     "actions": [
                         {
                             "label": "Generate Module",
-                            "route": "/ai_module_builder/generate",
+                            "route": "/ai_module_builder/generator/generate",
                             "action_type": "api_call",
                             "method": "POST"
                         }

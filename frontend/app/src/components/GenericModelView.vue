@@ -437,7 +437,7 @@ const deleteSelectedRecords = async () => {
 
 const handleAction = async(action)=>{
   console.log('handleAction', action)
-  const response = await authenticatedFetch(`http://localhost:8000${action.route}`,{
+  const response = await authenticatedFetch(`http://localhost:8000${action.route}/${selectedRecord.value.id}`,{
       method: action.method,
       headers: {
         'Content-Type': 'application/json',
