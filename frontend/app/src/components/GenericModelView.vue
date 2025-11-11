@@ -1,6 +1,6 @@
 <template>
   <div class="generic-model-view-container">
-    <BRow class="p-3 sticky-top bg-light shadow-sm" >
+    <BRow class="px-3 pt-3 sticky-top bg-light shadow-sm" id="header">
       <BCol lg="8" md="8"  xs="12" sm="12" class="text-start">
         <button v-if="showForm" type="button" class="btn btn-secondary btn-sm ms-2" @click="closeForm">Back</button>
         <button v-if="!showForm" class="btn btn-secondary btn-sm" @click="createNew">New</button>
@@ -45,25 +45,6 @@
       <div v-if="showForm" class="form-view">
         <form id="main-form" @submit.prevent="submitForm">
           
-                  <!-- <template v-if="uiSchema.views.form.layout && uiSchema.views.form.layout.type === 'notebook'">
-            <div class="tabs">
-                <button type="button"
-                v-for="tab in uiSchema.views.form.layout.tabs"
-                :key="tab.label"
-                :class="{ active: currentTab === tab.label }"
-                @click="selectTab(tab.label)"
-              >
-                {{ tab.label }}
-              </button>
-            </div>
-            <div class="tab-content">
-              <template v-for="tab in uiSchema.views.form.layout.tabs" :key="tab.label">
-                <div v-show="currentTab === tab.label">
-                  <FormGroup :group="{ type: 'group', children: tab.children }" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
-                </div>
-              </template>
-            </div>
-          </template> -->
           <template v-if="uiSchema.views.form.layout && uiSchema.views.form.layout.type === 'group'">
             <FormGroup :group="uiSchema.views.form.layout" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
           </template>
@@ -74,6 +55,7 @@
                 {{ field.label }}
                 <span v-if="field.required" style="color: red;">*</span>
               </label>
+              <!-- <pre>{{JSON.parse(selectedRecord[field.field]).replace('\n','')}}</pre> -->
               <input v-if="field.type === 'text' || field.type === 'number' || field.type === 'password'"
                     :type="field.type"
                     :id="field.field"
@@ -85,12 +67,18 @@
                           :id="field.field"
                           v-model="selectedRecord[field.field]"
                           :required="field.required" />
-              <textarea v-else-if="field.type === 'textarea'"
+              <textarea v-else-if="field.type === 'textarea' && !field.props.jsonViewer"
+                      :id="field.field"
+                      class="form-control"
+                      v-model="selectedRecord[field.field]"
+                      :required="field.required"
+                      v-bind="field.props"></textarea>
+              
+              <JsonViewer v-else-if="field.type === 'textarea' && field.props.jsonViewer"
                         :id="field.field"
-                        class="form-control"
-                        v-model="selectedRecord[field.field]"
-                        :required="field.required"
-                        v-bind="field.props"></textarea>
+                        :value="JSON.parse(selectedRecord[field.field] || '{}')"
+                        expanded="true"
+                        v-bind="field.props"></JsonViewer>
               <Many2oneSelect v-else-if="field.type === 'many2one'"
                               :moduleName="field.module_name"
                               :relatedModel="field.related_model"
@@ -168,6 +156,8 @@ import FormGroup from './common/FormGroup.vue'
 import Autocomplete from './common/Autocomplete.vue'
 import EmailInput from './common/EmailInput.vue'
 import One2many from './common/One2many.vue'
+import { JsonViewer } from "vue3-json-viewer"
+import "vue3-json-viewer/dist/vue3-json-viewer.css"
 import { BRow, BCol, BCard, BForm, BFormGroup, BFormInput, BButton } from 'bootstrap-vue-next'
 import api from '../utils/api'
 

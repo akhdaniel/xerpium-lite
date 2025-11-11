@@ -43,7 +43,8 @@ class GeneratorUISchema(BaseUISchema):
                             "required": False,
                             "props": {
                                 "rows": 15,
-                                "placeholder": "Provide a more detailed specification for the module, including relationships, specific field constraints, etc."
+                                "placeholder": "Provide a more detailed specification for the module, including relationships, specific field constraints, etc.",
+                                "jsonViewer": True
                             }
                         }
                     ],
