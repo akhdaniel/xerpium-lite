@@ -25,6 +25,7 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('authToken');
       router.push('/login');
+      window.location.reload();
     }
     return Promise.reject(error);
   }

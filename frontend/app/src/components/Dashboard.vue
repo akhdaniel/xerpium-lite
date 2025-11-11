@@ -15,6 +15,7 @@ import NumberCard from './dashboard/NumberCard.vue'
 import KpiCard from './dashboard/KpiCard.vue'
 import Chart from './dashboard/Chart.vue'
 import Table from './dashboard/Table.vue'
+import api from '../utils/api'
 
 const props = defineProps({
   moduleName: String,
@@ -39,16 +40,8 @@ const fetchDashboardItems = async (module) => {
   loading.value = true
   error.value = null
   try {
-    const token = localStorage.getItem('authToken')
-    const response = await fetch(`http://localhost:8000/${module}/dashboard`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    })
-    if (!response.ok) {
-      throw new Error('Failed to fetch dashboard items')
-    }
-    dashboardItems.value = await response.json()
+    const response = await api.get(`/${module}/dashboard`)
+    dashboardItems.value = response.data
   } catch (e) {
     error.value = e.message
   } finally {

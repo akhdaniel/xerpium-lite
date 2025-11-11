@@ -8,7 +8,7 @@
     <BCollapse id="nav-collapse" is-nav :visible="showMobileMenu">
       <BNavbarNav>
         <template v-for="item in menuItems" :key="item.id">
-          <BNavItemDropdown v-if="item.children && item.children.length" :text="item.name" >
+          <BNavItemDropdown v-if="item.children && item.children.length" :text="item.name">
             <BDropdownItem v-for="child in item.children" :key="child.id" :to="child.path ? (child.path.startsWith('/' + moduleName) ? child.path : '/' + moduleName + child.path) : '#'" @click="showMobileMenu = false">
               {{ child.name }}
             </BDropdownItem>

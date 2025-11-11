@@ -8,8 +8,10 @@
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>    
-    <Navbar v-if="route.params.moduleName" :module-name="route.params.moduleName" :user="user" @logout="handleLogout" @navigate-home="navigateHome" />
-    <router-view />
+    <Navbar class="sticky-top shadow-sm" style="z-index: 1030" v-if="route.params.moduleName" :module-name="route.params.moduleName" :user="user" @logout="handleLogout" @navigate-home="navigateHome" />
+    <div class="main-content">
+      <router-view />
+    </div>
   </div>
   <div v-else class="container mt-5">
     <BRow class="justify-content-center">
@@ -125,6 +127,11 @@ watch(isLoggedIn, (newVal) => {
   justify-content: center;
   align-items: center;
   z-index: 9999;
+}
+
+.main-content {
+  height: calc(100vh - 56px); /* Adjust 56px to your navbar's height */
+  overflow-y: auto;
 }
 </style>
 

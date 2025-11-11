@@ -1,0 +1,118 @@
+{
+  "module_name": "blog",
+  "description": "A blogging module that manages blogs, authors, posts, and comments.",
+  "entities": [
+    {
+      "name": "Blog",
+      "table": "blogs",
+      "fields": [
+        {"name": "id", "type": "Integer", "primary_key": true},
+        {"name": "title", "type": "String", "unique": true, "nullable": false},
+        {"name": "description", "type": "String"},
+        {"name": "is_active", "type": "Boolean", "default": true}
+      ],
+      "relationships": [
+        {"type": "OneToMany", "target": "Author", "back_populates": "blog", "cascade": "all, delete-orphan"}
+      ],
+      "methods": {
+        "model": [],
+        "service": ["get_blog", "get_blogs", "create_blog", "update_blog", "delete_blog"],
+        "router": ["GET /", "GET /{id}", "POST /", "PUT /{id}", "DELETE /{id}"]
+      }
+    },
+    {
+      "name": "Author",
+      "table": "authors",
+      "fields": [
+        {"name": "id", "type": "Integer", "primary_key": true},
+        {"name": "name", "type": "String", "nullable": false},
+        {"name": "email", "type": "String", "unique": true, "nullable": false},
+        {"name": "bio", "type": "String"},
+        {"name": "blog_id", "type": "ForeignKey", "target": "blogs.id"}
+      ],
+      "relationships": [
+        {"type": "ManyToOne", "target": "Blog", "back_populates": "authors"},
+        {"type": "OneToMany", "target": "Post", "back_populates": "author", "cascade": "all, delete-orphan"}
+      ],
+      "methods": {
+        "model": [],
+        "service": ["get_author", "get_authors", "create_author", "update_author", "delete_author", "get_authors_by_blog"],
+        "router": ["GET /", "GET /{id}", "GET /blog/{blog_id}", "POST /", "PUT /{id}", "DELETE /{id}"]
+      }
+    },
+    {
+      "name": "Post",
+      "table": "posts",
+      "fields": [
+        {"name": "id", "type": "Integer", "primary_key": true},
+        {"name": "title", "type": "String", "nullable": false},
+        {"name": "content", "type": "Text", "nullable": false},
+        {"name": "published_at", "type": "DateTime"},
+        {"name": "author_id", "type": "ForeignKey", "target": "authors.id"}
+      ],
+      "relationships": [
+        {"type": "ManyToOne", "target": "Author", "back_populates": "posts"},
+        {"type": "OneToMany", "target": "Comment", "back_populates": "post", "cascade": "all, delete-orphan"}
+      ],
+      "methods": {
+        "model": [],
+        "service": [
+          "get_post",
+          "get_posts",
+          "get_posts_by_author",
+          "create_post",
+          "update_post",
+          "delete_post",
+          "publish_post"
+        ],
+        "router": [
+          "GET /",
+          "GET /{id}",
+          "GET /author/{author_id}",
+          "POST /",
+          "PUT /{id}",
+          "DELETE /{id}",
+          "POST /{id}/publish"
+        ]
+      }
+    },
+    {
+      "name": "Comment",
+      "table": "comments",
+      "fields": [
+        {"name": "id", "type": "Integer", "primary_key": true},
+        {"name": "author_name", "type": "String", "nullable": false},
+        {"name": "text", "type": "Text", "nullable": false},
+        {"name": "created_at", "type": "DateTime", "default": "datetime.utcnow"},
+        {"name": "post_id", "type": "ForeignKey", "target": "posts.id"}
+      ],
+      "relationships": [
+        {"type": "ManyToOne", "target": "Post", "back_populates": "comments"}
+      ],
+      "methods": {
+        "model": [],
+        "service": ["get_comment", "get_comments", "get_comments_by_post", "create_comment", "delete_comment"],
+        "router": [
+          "GET /",
+          "GET /{id}",
+          "GET /post/{post_id}",
+          "POST /",
+          "DELETE /{id}"
+        ]
+      }
+    }
+  ],
+  "ui": {
+    "menus": [
+      {"id": 300, "name": "Blog Dashboard", "path": "/blog/dashboard", "icon": "dashboard-icon", "order": 0},
+      {"id": 301, "name": "Blogs", "path": "/blog/blogs", "icon": "blog-icon", "order": 1},
+      {"id": 302, "name": "Authors", "path": "/blog/authors", "icon": "author-icon", "order": 2},
+      {"id": 303, "name": "Posts", "path": "/blog/posts", "icon": "post-icon", "order": 3},
+      {"id": 304, "name": "Comments", "path": "/blog/comments", "icon": "comment-icon", "order": 4}
+    ],
+    "dashboards": [
+      {"id": "total_posts", "title": "Total Posts", "type": "kpi_card", "service": "get_total_posts"},
+      {"id": "total_comments", "title": "Total Comments", "type": "kpi_card", "service": "get_total_comments"}
+    ]
+  }
+}

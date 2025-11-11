@@ -1,8 +1,9 @@
 <template>
   <div class="generic-model-view-container">
-    <BRow class="px-3 pt-3">
+    <BRow class="p-3 sticky-top bg-light shadow-sm" >
       <BCol lg="8" md="8"  xs="12" sm="12" class="text-start">
-        <button class="btn btn-secondary btn-sm" @click="createNew">New</button>
+        <button v-if="showForm" type="button" class="btn btn-secondary btn-sm ms-2" @click="closeForm">Back</button>
+        <button v-if="!showForm" class="btn btn-secondary btn-sm" @click="createNew">New</button>
         <button v-if="showForm" type="submit" form="main-form" class="btn btn-primary btn-sm ms-2">Save</button>
         <template v-if="showForm && uiSchema.views.form.actions">
           <button v-for="action in uiSchema.views.form.actions"
@@ -13,7 +14,6 @@
             {{ action.label }}
           </button>
         </template>
-        <button v-if="showForm" type="button" class="btn btn-secondary btn-sm ms-2" @click="closeForm">Back</button>
         <button v-if="selectedRecords.length > 0 && !showForm" class="btn btn-danger btn-sm ms-2" @click="deleteSelectedRecords"><i class="bi bi-trash"></i> Delete Selected</button>
                         <span v-if="showForm" class="pt-2 px-2 text-bold fw-bold" style="text-align:left">
           <a href="#" @click.prevent="closeForm">{{ modelName.charAt(0).toUpperCase() + modelName.slice(1) }}</a>
@@ -26,7 +26,7 @@
       </BCol>
         
       <BCol lg="4" md="4" xs="12" sm="12" v-if="!showForm">
-        <div class="input-group mb-3">
+        <div class="input-group">
           <span class="input-group-text" id="basic-addon1">
             <i class="bi bi-search"></i> 
           </span>
@@ -36,125 +36,126 @@
       </BCol>
     </BRow>
 
-    <div v-if="loading">Loading...</div>
-    <div v-else-if="error" class="card m-5 text-danger">
-      {{ error }}
-    </div>
+    <div class="scrollable-content">
+      <div v-if="loading">Loading...</div>
+      <div v-else-if="error" class="card m-5 text-danger">
+        {{ error }}
+      </div>
 
-    <div v-if="showForm" class="form-view">
-      <form id="main-form" @submit.prevent="submitForm">
-        
-                <!-- <template v-if="uiSchema.views.form.layout && uiSchema.views.form.layout.type === 'notebook'">
-          <div class="tabs">
-              <button type="button"
-              v-for="tab in uiSchema.views.form.layout.tabs"
-              :key="tab.label"
-              :class="{ active: currentTab === tab.label }"
-              @click="selectTab(tab.label)"
-            >
-              {{ tab.label }}
-            </button>
-          </div>
-          <div class="tab-content">
-            <template v-for="tab in uiSchema.views.form.layout.tabs" :key="tab.label">
-              <div v-show="currentTab === tab.label">
-                <FormGroup :group="{ type: 'group', children: tab.children }" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
-              </div>
-            </template>
-          </div>
-        </template> -->
-        <template v-if="uiSchema.views.form.layout && uiSchema.views.form.layout.type === 'group'">
-          <FormGroup :group="uiSchema.views.form.layout" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
-        </template>
+      <div v-if="showForm" class="form-view">
+        <form id="main-form" @submit.prevent="submitForm">
+          
+                  <!-- <template v-if="uiSchema.views.form.layout && uiSchema.views.form.layout.type === 'notebook'">
+            <div class="tabs">
+                <button type="button"
+                v-for="tab in uiSchema.views.form.layout.tabs"
+                :key="tab.label"
+                :class="{ active: currentTab === tab.label }"
+                @click="selectTab(tab.label)"
+              >
+                {{ tab.label }}
+              </button>
+            </div>
+            <div class="tab-content">
+              <template v-for="tab in uiSchema.views.form.layout.tabs" :key="tab.label">
+                <div v-show="currentTab === tab.label">
+                  <FormGroup :group="{ type: 'group', children: tab.children }" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
+                </div>
+              </template>
+            </div>
+          </template> -->
+          <template v-if="uiSchema.views.form.layout && uiSchema.views.form.layout.type === 'group'">
+            <FormGroup :group="uiSchema.views.form.layout" :get-field-schema="getFieldSchema" :selected-record="selectedRecord" :module-name="moduleName" />
+          </template>
 
-        <template v-else>
-          <div v-for="field in uiSchema.views.form.fields" :key="field.field" class="form-group">
-            <label :for="field.field">
-              {{ field.label }}
-              <span v-if="field.required" style="color: red;">*</span>
-            </label>
-            <input v-if="field.type === 'text' || field.type === 'number' || field.type === 'password'"
-                   :type="field.type"
-                   :id="field.field"
-                   class="form-control"
-                   v-model="selectedRecord[field.field]"
-                   :required="field.required"
-                   v-bind="field.props">
-            <EmailInput v-else-if="field.type === 'email'"
-                        :id="field.field"
-                        v-model="selectedRecord[field.field]"
-                        :required="field.required" />
-            <textarea v-else-if="field.type === 'textarea'"
-                      :id="field.field"
-                      class="form-control"
-                      v-model="selectedRecord[field.field]"
-                      :required="field.required"
-                      v-bind="field.props"></textarea>
-            <Many2oneSelect v-else-if="field.type === 'many2one'"
-                            :moduleName="field.module_name"
-                            :relatedModel="field.related_model"
-                            :field="field.field"
-                            :value="selectedRecord[field.field]"
-                            :displayField="field.display_field || 'name'"
-                            :required="field.required"
-                            @update:value="selectedRecord[field.field] = $event">
-            </Many2oneSelect>
-            <Autocomplete v-else-if="field.type === 'autocomplete'"
-                          :url="field.url"
+          <template v-else>
+            <div v-for="field in uiSchema.views.form.fields" :key="field.field" class="form-group">
+              <label :for="field.field">
+                {{ field.label }}
+                <span v-if="field.required" style="color: red;">*</span>
+              </label>
+              <input v-if="field.type === 'text' || field.type === 'number' || field.type === 'password'"
+                    :type="field.type"
+                    :id="field.field"
+                    class="form-control"
+                    v-model="selectedRecord[field.field]"
+                    :required="field.required"
+                    v-bind="field.props">
+              <EmailInput v-else-if="field.type === 'email'"
+                          :id="field.field"
                           v-model="selectedRecord[field.field]"
-                          :required="field.required"
-                          >
-            </Autocomplete>
-            <DateTimePicker v-else-if="field.type === 'datetime'"
-                            :field="field.field"
+                          :required="field.required" />
+              <textarea v-else-if="field.type === 'textarea'"
+                        :id="field.field"
+                        class="form-control"
+                        v-model="selectedRecord[field.field]"
+                        :required="field.required"
+                        v-bind="field.props"></textarea>
+              <Many2oneSelect v-else-if="field.type === 'many2one'"
+                              :moduleName="field.module_name"
+                              :relatedModel="field.related_model"
+                              :field="field.field"
+                              :value="selectedRecord[field.field]"
+                              :displayField="field.display_field || 'name'"
+                              :required="field.required"
+                              @update:value="selectedRecord[field.field] = $event">
+              </Many2oneSelect>
+              <Autocomplete v-else-if="field.type === 'autocomplete'"
+                            :url="field.url"
                             v-model="selectedRecord[field.field]"
                             :required="field.required"
-                            :showTime="true"
-                            :type="field.type"
                             >
-            </DateTimePicker>
-            <DateTimePicker v-else-if="field.type === 'date'"
-                            :field="field.field"
-                            v-model="selectedRecord[field.field]"
-                            :required="field.required"
-                            :showTime="false"
-                            :type="field.type"
-                            >
-            </DateTimePicker>
-            <One2many v-else-if="field.type === 'one2many'"
-                      :field="field"
-                      v-model="selectedRecord[field.field]"
-                      >
-            </One2many>
-            <!-- Add more input types as needed -->
-          </div>
-        </template>
-        
-      </form>
-    </div>
+              </Autocomplete>
+              <DateTimePicker v-else-if="field.type === 'datetime'"
+                              :field="field.field"
+                              v-model="selectedRecord[field.field]"
+                              :required="field.required"
+                              :showTime="true"
+                              :type="field.type"
+                              >
+              </DateTimePicker>
+              <DateTimePicker v-else-if="field.type === 'date'"
+                              :field="field.field"
+                              v-model="selectedRecord[field.field]"
+                              :required="field.required"
+                              :showTime="false"
+                              :type="field.type"
+                              >
+              </DateTimePicker>
+              <One2many v-else-if="field.type === 'one2many'"
+                        :field="field"
+                        v-model="selectedRecord[field.field]"
+                        >
+              </One2many>
+              <!-- Add more input types as needed -->
+            </div>
+          </template>
+          
+        </form>
+      </div>
 
-    <div v-else class="list-view">
-      <table class="data-table" v-if="uiSchema">
-        <thead>
-          <tr>
-            <th style="width: 1%;"><input type="checkbox" class="form-check-input" @click="toggleSelectAll" /></th>
-            <th v-for="column in uiSchema.views.list.columns" :key="column.field" @click="sortBy(column.field)" style="cursor: pointer;">
-              {{ column.headerName }}
-              <i v-if="sortKey === column.field" :class="['bi', sortOrder === 'asc' ? 'bi-sort-alpha-down' : 'bi-sort-alpha-up']"></i>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="record in sortedRecords" :key="record.id" @click="openForm(record)" style="cursor: pointer;">
-            <td><input type="checkbox" class="form-check-input" :value="record.id" v-model="selectedRecords" @click.stop /></td>
-            <td v-for="column in uiSchema.views.list.columns" :key="column.field">
-              {{ getNestedValue(record, column.field) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-else class="list-view">
+        <table class="data-table" v-if="uiSchema">
+          <thead>
+            <tr>
+              <th style="width: 1%;"><input type="checkbox" class="form-check-input" @click="toggleSelectAll" /></th>
+              <th v-for="column in uiSchema.views.list.columns" :key="column.field" @click="sortBy(column.field)" style="cursor: pointer;">
+                {{ column.headerName }}
+                <i v-if="sortKey === column.field" :class="['bi', sortOrder === 'asc' ? 'bi-sort-alpha-down' : 'bi-sort-alpha-up']"></i>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="record in sortedRecords" :key="record.id" @click="openForm(record)" style="cursor: pointer;">
+              <td><input type="checkbox" class="form-check-input" :value="record.id" v-model="selectedRecords" @click.stop /></td>
+              <td v-for="column in uiSchema.views.list.columns" :key="column.field">
+                {{ getNestedValue(record, column.field) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    
   </div>
 </template>
 
@@ -404,6 +405,9 @@ const handleAction = async(action)=>{
   try {
     await api[action.method.toLowerCase()](`${action.route}/${selectedRecord.value.id}`)
     
+    // After successful action, refetch the record to update the form
+    const response = await api.get(`/${props.moduleName}/${props.modelName.toLowerCase()}/${selectedRecord.value.id}`)
+    selectedRecord.value = response.data
   }
   catch (e) {
     console.log(e.message)
@@ -445,5 +449,10 @@ watch(uiSchema, (newSchema) => {
 .tabs button.active {
   background-color: #fff;
   border-bottom: 1px solid #fff;
+}
+
+.scrollable-content {
+  height: calc(100vh - 120px); /* Adjust this value based on your header's height */
+  overflow-y: auto;
 }
 </style>

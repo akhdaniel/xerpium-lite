@@ -218,7 +218,6 @@ select {
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
 }
 
 .data-table th, .data-table td {
@@ -237,7 +236,6 @@ select {
 }
 
 .form-view {
-  margin-top: 20px;
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -380,7 +378,6 @@ select {
 .table-card table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
 }
 
 .table-card th, .table-card td {
