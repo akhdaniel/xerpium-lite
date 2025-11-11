@@ -24,7 +24,7 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { authenticatedFetch } from '../../utils/api';
+import api from '../../utils/api';
 
 const props = defineProps({
   modelValue: [String, Number, Object],
@@ -54,14 +54,10 @@ const fetchSuggestions = async () => {
     return;
   }
   try {
-    const response = await authenticatedFetch(`http://localhost:8000${props.url}?q=${searchTerm.value}`);
-    if (response.ok) {
-      suggestions.value = await response.json();
-    }
+    const response = await api.get(`${props.url}?q=${searchTerm.value}`);
+    suggestions.value = response.data;
   } catch (error) {
-    if (error.message !== 'Unauthorized') {
-      console.error('Error fetching suggestions:', error);
-    }
+    console.error('Error fetching suggestions:', error);
   }
 };
 
@@ -89,15 +85,11 @@ const fetchRecord = async (id) => {
     return;
   }
   try {
-    const response = await authenticatedFetch(`http://localhost:8000${props.url}/${id}`);
-    if (response.ok) {
-      const record = await response.json();
-      searchTerm.value = record.name;
-    }
+    const response = await api.get(`${props.url}/${id}`);
+    const record = response.data;
+    searchTerm.value = record.name;
   } catch (error) {
-    if (error.message !== 'Unauthorized') {
-      console.error('Error fetching record:', error);
-    }
+    console.error('Error fetching record:', error);
   }
 };
 

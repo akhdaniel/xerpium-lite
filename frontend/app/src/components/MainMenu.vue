@@ -13,7 +13,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { authenticatedFetch } from '../utils/api'
+import api from '../utils/api'
 
 const router = useRouter()
 const modules = ref([])
@@ -28,15 +28,10 @@ const fetchModules = async () => {
   loading.value = true
   error.value = null
   try {
-    const response = await authenticatedFetch('http://localhost:8000/base/modules/')
-    if (!response.ok) {
-      throw new Error('Failed to fetch modules')
-    }
-    modules.value = await response.json()
+    const response = await api.get('/base/modules/')
+    modules.value = response.data
   } catch (e) {
-    if (e.message !== 'Unauthorized') {
-      error.value = e.message
-    }
+    error.value = e.message
   } finally {
     loading.value = false
   }

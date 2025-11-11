@@ -5,6 +5,7 @@ from datetime import datetime
 class GenerationLogBase(BaseModel):
     module_name: str
     specification: str
+    detailed_specification: Optional[str] = None
     generated_files: Optional[List[str]] = None
 
 class GenerationLogCreate(GenerationLogBase):

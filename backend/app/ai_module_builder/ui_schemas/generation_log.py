@@ -35,6 +35,16 @@ class GeneratorUISchema(BaseUISchema):
                                 "rows": 10,
                                 "placeholder": "e.g., Create a model named 'Post' with fields: title (string), content (text), is_published (boolean)."
                             }
+                        },
+                        {
+                            "field": "detailed_specification",
+                            "label": "Detailed Specification",
+                            "type": "textarea",
+                            "required": False,
+                            "props": {
+                                "rows": 15,
+                                "placeholder": "Provide a more detailed specification for the module, including relationships, specific field constraints, etc."
+                            }
                         }
                     ],
                     "actions": [

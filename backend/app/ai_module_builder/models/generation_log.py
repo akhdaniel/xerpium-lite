@@ -8,5 +8,6 @@ class GenerationLog(Base):
     id = Column(Integer, primary_key=True, index=True)
     module_name = Column(String, index=True, nullable=False)
     specification = Column(Text, nullable=False)
+    detailed_specification = Column(Text, nullable=True)
     generated_files = Column(JSON)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

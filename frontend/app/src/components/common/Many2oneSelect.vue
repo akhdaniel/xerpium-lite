@@ -9,7 +9,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { authenticatedFetch } from '../../utils/api'
+import api from '../../utils/api'
 
 const props = defineProps({
   moduleName: {
@@ -43,15 +43,10 @@ const items = ref([])
 
 const fetchItems = async () => {
   try {
-    const response = await authenticatedFetch(`http://localhost:8000/${props.moduleName}/${props.relatedModel.toLowerCase()}`)
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${props.relatedModel}`)
-    }
-    items.value = await response.json()
+    const response = await api.get(`/${props.moduleName}/${props.relatedModel.toLowerCase()}`)
+    items.value = response.data
   } catch (e) {
-    if (e.message !== 'Unauthorized') {
-      console.error(`Error fetching ${props.relatedModel}:`, e)
-    }
+    console.error(`Error fetching ${props.relatedModel}:`, e)
   }
 }
 

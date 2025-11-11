@@ -1,6 +1,13 @@
 
+
 <template>
+
   <div v-if="isLoggedIn">
+    <div v-if="isLoading" class="loading-indicator">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>    
     <Navbar v-if="route.params.moduleName" :module-name="route.params.moduleName" :user="user" @logout="handleLogout" @navigate-home="navigateHome" />
     <router-view />
   </div>
@@ -31,6 +38,8 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Navbar from './components/Navbar.vue'
 import { BRow, BCol, BCard, BForm, BFormGroup, BFormInput, BButton } from 'bootstrap-vue-next'
+import api from './utils/api'
+import { isLoading } from './utils/loading'
 
 const email = ref('')
 const password = ref('')
@@ -41,41 +50,28 @@ const user = ref({})
 const router = useRouter()
 const route = useRoute()
 
-const handleUnauthorized = (response) => {
-  if (response.status === 401) {
-    localStorage.removeItem('authToken')
-    router.push('/login')
-    return true
-  }
-  return false
-}
-
 const handleLogin = async () => {
   errorMessage.value = ''
   try {
-    const response = await fetch('http://localhost:8000/base/auth/token', {
-      method: 'POST',
+    const response = await api.post('/base/auth/token', new URLSearchParams({
+        username: email.value,
+        password: password.value,
+    }), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        username: email.value,
-        password: password.value,
-      }),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.detail || 'Login failed')
-    }
-
-    const data = await response.json()
-    localStorage.setItem('authToken', data.access_token)
+    localStorage.setItem('authToken', response.data.access_token)
     isLoggedIn.value = true
     fetchUser()
     router.push('/') // Redirect to main menu after login
   } catch (error) {
-    errorMessage.value = error.message
+    if (error.response && error.response.data && error.response.data.detail) {
+      errorMessage.value = error.response.data.detail
+    } else {
+      errorMessage.value = 'Login failed'
+    }
     console.error('Login error:', error)
   }
 }
@@ -91,21 +87,11 @@ const fetchUser = async () => {
   const token = localStorage.getItem('authToken')
   if (token) {
     try {
-      const response = await fetch('http://localhost:8000/base/users/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-      if (response.ok) {
-        user.value = await response.json()
-        isLoggedIn.value = true
-      } else if (handleUnauthorized(response)) {
-        return
-      } else {
-        handleLogout()
-      }
+      const response = await api.get('/base/users/me')
+      user.value = response.data
+      isLoggedIn.value = true
     } catch (error) {
-      handleLogout()
+        handleLogout()
     }
   }
 }
@@ -126,3 +112,19 @@ watch(isLoggedIn, (newVal) => {
   }
 })
 </script>
+
+<style>
+.loading-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+</style>
+

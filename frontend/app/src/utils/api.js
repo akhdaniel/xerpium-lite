@@ -1,21 +1,33 @@
+import axios from 'axios';
 import router from '../router';
+import { startLoadingTimer, stopLoadingTimer } from './loading';
 
-export const authenticatedFetch = async (url, options) => {
+const api = axios.create({
+  baseURL: 'http://localhost:8000',
+});
+
+api.interceptors.request.use(config => {
+  startLoadingTimer();
   const token = localStorage.getItem('authToken');
-  const headers = {
-    ...options?.headers,
-  };
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    config.headers['Authorization'] = `Bearer ${token}`;
   }
+  return config;
+});
 
-  const response = await fetch(url, { ...options, headers });
-
-  if (response.status === 401) {
-    localStorage.removeItem('authToken');
-    router.push('/login');
-    throw new Error('Unauthorized');
+api.interceptors.response.use(
+  response => {
+    stopLoadingTimer();
+    return response;
+  },
+  error => {
+    stopLoadingTimer();
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('authToken');
+      router.push('/login');
+    }
+    return Promise.reject(error);
   }
+);
 
-  return response;
-};
+export default api;

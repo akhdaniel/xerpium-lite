@@ -35,7 +35,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { authenticatedFetch } from '../utils/api'
+import api from '../utils/api'
 import { BNavbar, BNavbarBrand, BNavbarNav, BNavItem, BNavItemDropdown, BDropdownItem, BCollapse, BNavbarToggle } from 'bootstrap-vue-next'
 
 const props = defineProps({
@@ -52,16 +52,11 @@ const toggleMobileMenu = () => {
 
 const fetchMenuItems = async (module) => {
   try {
-    const response = await authenticatedFetch(`http://localhost:8000/base/menu/${module}`)
-    if (!response.ok) {
-      throw new Error('Failed to fetch menu items')
-    }
-    menuItems.value = await response.json()
+    const response = await api.get(`/base/menu/${module}`)
+    menuItems.value = response.data
     console.log('Fetched menu items:', menuItems.value)
   } catch (error) {
-    if (error.message !== 'Unauthorized') {
-      console.error('Error fetching menu items:', error)
-    }
+    console.error('Error fetching menu items:', error)
   }
 }
 

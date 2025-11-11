@@ -37,9 +37,11 @@
     </BRow>
 
     <div v-if="loading">Loading...</div>
-    <div v-else-if="error">{{ error }}</div>
+    <div v-else-if="error" class="card m-5 text-danger">
+      {{ error }}
+    </div>
 
-    <div v-else-if="showForm" class="form-view">
+    <div v-if="showForm" class="form-view">
       <form id="main-form" @submit.prevent="submitForm">
         
                 <!-- <template v-if="uiSchema.views.form.layout && uiSchema.views.form.layout.type === 'notebook'">
@@ -132,7 +134,7 @@
     </div>
 
     <div v-else class="list-view">
-      <table class="data-table">
+      <table class="data-table" v-if="uiSchema">
         <thead>
           <tr>
             <th style="width: 1%;"><input type="checkbox" class="form-check-input" @click="toggleSelectAll" /></th>
@@ -152,6 +154,7 @@
         </tbody>
       </table>
     </div>
+    
   </div>
 </template>
 
@@ -165,7 +168,7 @@ import Autocomplete from './common/Autocomplete.vue'
 import EmailInput from './common/EmailInput.vue'
 import One2many from './common/One2many.vue'
 import { BRow, BCol, BCard, BForm, BFormGroup, BFormInput, BButton } from 'bootstrap-vue-next'
-import { authenticatedFetch } from '../utils/api'
+import api from '../utils/api'
 
 const props = defineProps({
   moduleName: String,
@@ -273,16 +276,11 @@ const fetchUISchema = async () => {
   loading.value = true
   error.value = null
   try {
-    const response = await authenticatedFetch(`http://localhost:8000/${props.moduleName}/ui_schemas/${props.modelName.toLowerCase()}`)
-    if (!response.ok) {
-      throw new Error('Failed to fetch UI schema')
-    }
-    uiSchema.value = await response.json()
-    fetchRecords()
+    const response = await api.get(`/${props.moduleName}/ui_schemas/${props.modelName.toLowerCase()}`)
+    uiSchema.value = response.data
+    await fetchRecords()
   } catch (e) {
-    if (e.message !== 'Unauthorized') {
-      error.value = e.message
-    }
+    error.value = e.message
   }
 }
 
@@ -290,15 +288,10 @@ const fetchRecords = async () => {
   loading.value = true
   error.value = null
   try {
-    const response = await authenticatedFetch(`http://localhost:8000/${props.moduleName}/${props.modelName.toLowerCase()}`)
-    if (!response.ok) {
-      throw new Error('Failed to fetch records')
-    }
-    records.value = await response.json()
+    const response = await api.get(`/${props.moduleName}/${props.modelName.toLowerCase()}`)
+    records.value = response.data
   } catch (e) {
-    if (e.message !== 'Unauthorized') {
-      error.value = e.message
-    }
+    error.value = e.message
   } finally {
     loading.value = false
   }
@@ -311,12 +304,14 @@ const openForm = (record) => {
 }
 
 const createNew = () => {
+  error.value = null
   selectedRecord.value = {}
   formMode.value = 'create'
   showForm.value = true
 }
 
 const closeForm = () => {
+  error.value = null
   showForm.value = false
   selectedRecord.value = null
 }
@@ -326,9 +321,9 @@ const submitForm = async () => {
   error.value = null
   try {
     const url = formMode.value === 'create'
-      ? `http://localhost:8000/${props.moduleName}/${props.modelName.toLowerCase()}`
-      : `http://localhost:8000/${props.moduleName}/${props.modelName.toLowerCase()}/${selectedRecord.value.id}`
-    const method = formMode.value === 'create' ? 'POST' : 'PUT'
+      ? `/${props.moduleName}/${props.modelName.toLowerCase()}`
+      : `/${props.moduleName}/${props.modelName.toLowerCase()}/${selectedRecord.value.id}`
+    const method = formMode.value === 'create' ? 'post' : 'put'
 
     const body = { ...selectedRecord.value };
 
@@ -348,25 +343,14 @@ const submitForm = async () => {
       });
     }
 
-    const response = await authenticatedFetch(url, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    })
+    const response = await api[method](url, body)
 
-    if (!response.ok) {
-      throw new Error('Failed to save record')
-    }
-    const savedRecord = await response.json();
+    const savedRecord = response.data;
     selectedRecord.value = savedRecord;
     formMode.value = 'edit';
     await fetchRecords()
   } catch (e) {
-    if (e.message !== 'Unauthorized') {
-      error.value = e.message
-    }
+    error.value = e.message
   } finally {
     loading.value = false
   }
@@ -380,19 +364,10 @@ const deleteRecord = async (recordId) => {
   loading.value = true
   error.value = null
   try {
-    const response = await authenticatedFetch(`http://localhost:8000/${props.moduleName}/${props.modelName.toLowerCase()}/${recordId}`,
-      {
-        method: 'DELETE',
-      }
-    )
-    if (!response.ok) {
-      throw new Error('Failed to delete record')
-    }
+    await api.delete(`/${props.moduleName}/${props.modelName.toLowerCase()}/${recordId}`)
     await fetchRecords()
   } catch (e) {
-    if (e.message !== 'Unauthorized') {
-      error.value = e.message
-    }
+    error.value = e.message
   } finally {
     loading.value = false
   }
@@ -411,38 +386,29 @@ const deleteSelectedRecords = async () => {
   error.value = null;
   try {
     const promises = selectedRecords.value.map(recordId => {
-      return authenticatedFetch(`http://localhost:8000/${props.moduleName}/${props.modelName.toLowerCase()}/${recordId}`, {
-        method: 'DELETE',
-      });
+      return api.delete(`/${props.moduleName}/${props.modelName.toLowerCase()}/${recordId}`);
     });
 
-    const responses = await Promise.all(promises);
-
-    responses.forEach(response => {
-      if (!response.ok) {
-        throw new Error('Failed to delete one or more records');
-      }
-    });
+    await Promise.all(promises);
 
     await fetchRecords();
     selectedRecords.value = [];
   } catch (e) {
-    if (e.message !== 'Unauthorized') {
-      error.value = e.message;
-    }
+    error.value = e.message;
   } finally {
     loading.value = false;
   }
 };
 
 const handleAction = async(action)=>{
-  console.log('handleAction', action)
-  const response = await authenticatedFetch(`http://localhost:8000${action.route}/${selectedRecord.value.id}`,{
-      method: action.method,
-      headers: {
-        'Content-Type': 'application/json',
-      },    
-  })
+  try {
+    await api[action.method.toLowerCase()](`${action.route}/${selectedRecord.value.id}`)
+    
+  }
+  catch (e) {
+    console.log(e.message)
+    error.value = e.response.data.detail || e.message
+  }
 
 }
 
