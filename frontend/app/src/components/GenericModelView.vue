@@ -1,6 +1,6 @@
 <template>
   <div class="generic-model-view-container">
-    <BRow class="px-3 pt-3 sticky-top bg-light shadow-sm" id="header">
+    <BRow class="p-3 sticky-top bg-light shadow-sm" id="header">
       <BCol lg="8" md="8"  xs="12" sm="12" class="text-start">
         <button v-if="showForm" type="button" class="btn btn-secondary btn-sm ms-2" @click="closeForm">Back</button>
         <button v-if="!showForm" class="btn btn-secondary btn-sm" @click="createNew">New</button>
@@ -73,12 +73,17 @@
                       v-model="selectedRecord[field.field]"
                       :required="field.required"
                       v-bind="field.props"></textarea>
-              
-              <JsonViewer v-else-if="field.type === 'textarea' && field.props.jsonViewer"
-                        :id="field.field"
-                        :value="JSON.parse(selectedRecord[field.field] || '{}')"
-                        expanded="true"
-                        v-bind="field.props"></JsonViewer>
+              <div v-else-if="field.type === 'textarea' && field.props.jsonViewer" class="json-viewer-wrapper">
+                <button type="button"
+                        class="btn btn-sm btn-outline-secondary mb-2"
+                        @click="toggleJsonViewerExpand">
+                  {{ isJsonViewerExpanded ? 'Collapse All' : 'Expand All' }}
+                </button>
+                <JsonViewer :id="field.field"
+                            :value="JSON.parse(selectedRecord[field.field] || '{}')"
+                            :expanded="isJsonViewerExpanded">
+                </JsonViewer>
+              </div>
               <Many2oneSelect v-else-if="field.type === 'many2one'"
                               :moduleName="field.module_name"
                               :relatedModel="field.related_model"
@@ -169,10 +174,16 @@ const props = defineProps({
 const sortKey = ref('');
 const sortOrder = ref('asc');
 const selectedRecords = ref([]);
+const isJsonViewerExpanded = ref();
 
 const getNestedValue = (obj, path) => {
   if (!path) return obj;
   return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+};
+
+const toggleJsonViewerExpand = () => {
+  isJsonViewerExpanded.value = !isJsonViewerExpanded.value;
+  console.log(isJsonViewerExpanded.value)
 };
 
 const getFieldSchema = (fieldName) => {
